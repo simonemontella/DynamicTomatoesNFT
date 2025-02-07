@@ -1,0 +1,21 @@
+IDE: Remix Desktop
+
+Frameworks e Strumenti:
+    Testing&Deployment Smart Contracts:
+        - Hardhat: permette di effettuare test in JavaScript/TypeScript
+        - Foundry: ambiente di test in Solidity puro
+    
+    Storage metadati: *sarebbe costoso salvarli sulla blockchain
+        - IPFS: InterPlanetary File System
+        - Pinata: facilita l'accesso ad IPFS con API semplici
+
+    Frontend:
+        - React
+    
+    IoT Data:
+        - OpenWheatherMap
+        - ThingSpeak
+
+    Librerie Solidity:
+        - Chainlink: rete di oracoli per l'integrazione dei dati dagli API esterni
+        - OpenZeppelin: utility varie (come modifier onlyOwner)
