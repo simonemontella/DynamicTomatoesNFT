@@ -1,6 +1,9 @@
 package-lock.json
 package.json
 
+artifacts
+.deps
+
 # Logs
 logs
 *.log
