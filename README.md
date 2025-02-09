@@ -1,2 +1,5 @@
 # parthenopeNFT
-Project Work for Blockchain &amp; Decentralized Applications
+Unina Blockchain & DApps course's project work
+
+### IDE
+Remix Desktop

@@ -5,7 +5,7 @@ Frameworks e Strumenti:
         - Hardhat: permette di effettuare test in JavaScript/TypeScript
         - Foundry: ambiente di test in Solidity puro
     
-    Storage metadati: *sarebbe costoso salvarli sulla blockchain
+    Storage metadati NFT: *sarebbe costoso salvarli sulla blockchain
         - IPFS: InterPlanetary File System
         - Pinata: facilita l'accesso ad IPFS con API semplici
 
