@@ -3,19 +3,34 @@ IDE: Remix Desktop
 Frameworks e Strumenti:
     Testing&Deployment Smart Contracts:
         - Hardhat: permette di effettuare test in JavaScript/TypeScript
-        - Foundry: ambiente di test in Solidity puro
+            https://hardhat.org/tutorial
     
-    Storage metadati NFT: *sarebbe costoso salvarli sulla blockchain
-        - IPFS: InterPlanetary File System
-        - Pinata: facilita l'accesso ad IPFS con API semplici
-
     Frontend:
         - React
+
+    Storage metadati NFT: *sarebbe costoso salvarli on-chain
+        - IPFS: InterPlanetary File System
+        - Pinata: facilita l'accesso ad IPFS con API semplici
     
     IoT Data:
-        - OpenWheatherMap
+        - OpenWheather
         - ThingSpeak
 
     Librerie Solidity:
-        - Chainlink: rete di oracoli per l'integrazione dei dati dagli API esterni
-        - OpenZeppelin: utility varie (come modifier onlyOwner)
+        - Chainlink: rete di oracoli per l'integrazione dei dati dall'esterno della blockchain
+            - Functions: permettono di utilizzare API esterni direttamente negli SC
+                https://www.youtube.com/watch?v=fut2_xDJczQ&list=PLVP9aGDn-X0TrCZGlgkVr-S29cG1Bqt5s
+                https://docs.chain.link/chainlink-functions/getting-started
+                https://functions.chain.link/playground
+
+        - OpenZeppelin: utility Solidity
+            - Ownable: gestione della proprietà dei contratti
+            - ERC721: standard Non-Fungible Token
+                - ERC721: implementazione di base con metadati non modificabili
+                - ERC721URIStorage: implementazione dinamica dei metadati (con IPFS)
+
+Struttura files: *di default di hardhat
+    - contracts/ : contiene il codice Solidity degli SC (logica on-chain)
+    - test/ : contiene i file js per i vari test 
+    - ignition/ : contiene il codice da esguire off-chain
+    - / : contiene i vari moduli per node.js e il file secrets

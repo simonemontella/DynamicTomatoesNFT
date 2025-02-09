@@ -4,11 +4,12 @@ package.json
 .deps
 .git
 
-cache
-artifacts
+cache/
+artifacts/
 
 build/Release
 
 node_modules/
 
-contract/artifacts
+contracts/artifacts/
+ignition/
