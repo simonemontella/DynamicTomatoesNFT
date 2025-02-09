@@ -12,4 +12,3 @@ build/Release
 node_modules/
 
 contracts/artifacts/
-ignition/
