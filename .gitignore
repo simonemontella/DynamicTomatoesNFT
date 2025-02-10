@@ -4,6 +4,8 @@ package.json
 .deps
 .git
 
+.env
+
 cache/
 artifacts/
 
@@ -12,3 +14,4 @@ build/Release
 node_modules/
 
 contracts/artifacts/
+ignition/
