@@ -21,9 +21,12 @@ Frameworks e Strumenti:
     Librerie Solidity:
         - Chainlink: rete di oracoli per l'integrazione dei dati dall'esterno della blockchain
             - Functions: permettono di utilizzare API esterni direttamente negli SC
+                https://functions.chain.link/
                 https://www.youtube.com/watch?v=fut2_xDJczQ&list=PLVP9aGDn-X0TrCZGlgkVr-S29cG1Bqt5s
                 https://docs.chain.link/chainlink-functions/getting-started
-                https://functions.chain.link/playground
+                https://functions.chain.link/
+            - DON-Hosted Secrets: upload delle key private sul DON
+            https://docs.chain.link/chainlink-functions/resources/billing#minimum-balance-for-uploading-encrypted-secrets
 
         - OpenZeppelin: utility Solidity
             - Ownable: gestione della proprietà dei contratti
@@ -33,10 +36,11 @@ Frameworks e Strumenti:
                 https://docs.chain.link/quickstarts/dynamic-metadata
 
     Librerie JS:
-        - Ethers: permette di interagire con la blockchain di ethereum
+        - Ethers: permette di interagire con la blockchain di ethereum (è inclusa in hardhat)
 
 Blockchain:
     - Sepolia: testnet di ethereum
+    https://docs.chain.link/chainlink-functions/supported-networks#sepolia-testnet
 
 Wallet:
     - Metamask

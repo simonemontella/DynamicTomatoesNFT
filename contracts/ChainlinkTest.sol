@@ -1,5 +1,5 @@
 //SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
+pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";
@@ -10,8 +10,8 @@ contract ChainlinkTest is FunctionsClient, Ownable {
 
     address FUNCTIONS_ROUTER = 0xb83E47C2bC239B3bf370bc41e1459A34b41238D0;
 
-    uint256 temperature;
-    uint256 humidity;
+    uint256 public temperature;
+    uint256 public humidity;
 
     string request =
         "const response = await Functions.makeHttpRequest({"
@@ -33,9 +33,13 @@ contract ChainlinkTest is FunctionsClient, Ownable {
 
     constructor() Ownable(msg.sender) FunctionsClient(FUNCTIONS_ROUTER) {}
 
-    function requestData() external onlyOwner {
+    function requestData(
+        uint8 _secretsSlotID,
+        uint64 _secretsVersion
+    ) external onlyOwner {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(request);
+        req.addDONHostedSecrets(_secretsSlotID, _secretsVersion);
 
         _sendRequest(
             req.encodeCBOR(), //CBOR = Concise Binary Object Reperesentation

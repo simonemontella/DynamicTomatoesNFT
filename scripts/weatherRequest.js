@@ -1,11 +1,9 @@
-require("dotenv").config();
-
 const response = await Functions.makeHttpRequest({
   url: `https://api.openweathermap.org/data/2.5/weather`,
   method: "GET",
   params: {
     q: "Naples",
-    appid: process.env.OPENWEATHER_API_KEY,
+    appid: secrets.OPENWEATHER_API_KEY,
   },
 });
 

@@ -1,34 +1,28 @@
-const hre = require("hardhat");
+const { ethers } = require("hardhat");
 
-async function main() {
-  const [signer] = await hre.ethers.getSigners();
-  console.log("Signer address:", signer.address);
+async function estimateGas() {
+  const contractName = "ChainlinkTest";
+  const ContractFactory = await ethers.getContractFactory(contractName);
 
-  const ContractFactory = await hre.ethers.getContractFactory("ChainlinkTest");
-
-  const deployTransaction = ContractFactory.getDeployTransaction();
+  const deployTransaction = await ContractFactory.getDeployTransaction();
   if (!deployTransaction.data) {
     throw new Error("Dati della transazione non generati correttamente");
   }
 
-  const estimatedGas = await signer.estimateGas(deployTransaction);
-  const gasPrice = await signer.getGasPrice();
-  const deploymentCost = estimatedGas.mul(gasPrice);
+  const estimatedGas = await ethers.provider.estimateGas(deployTransaction);
+  const gasPrice = (await ethers.provider.getFeeData()).gasPrice;
+  const deploymentCost = estimatedGas * gasPrice;
 
-  console.log("Gas stimato per la distribuzione:", estimatedGas.toString());
-  console.log(
-    "Prezzo del gas:",
-    hre.ethers.utils.formatUnits(gasPrice, "gwei"),
-    "Gwei"
-  );
+  console.log("Quantità gas :", estimatedGas.toString());
+  console.log("Prezzo del gas:", gasPrice.toString(), "wei");
   console.log(
     "Costo stimato della distribuzione:",
-    hre.ethers.utils.formatEther(deploymentCost),
+    ethers.formatEther(deploymentCost),
     "ETH"
   );
 }
 
-main().catch((error) => {
+estimateGas().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
