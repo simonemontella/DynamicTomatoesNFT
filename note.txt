@@ -51,3 +51,7 @@ Struttura files:
     - ignition/ : dovrebbe contenere i moduli del deploy
     - scripts/ : contiene alcuni script js di utility
     - / : contiene i vari moduli per node.js e il file secrets
+
+PROBLEMI!!!!:
+    - chainlink/functions-toolkit che offre utility per l'integrazione con chainlink utiliza ethersV5
+        -> risolto installando entrambi i packages (v5 e v6)

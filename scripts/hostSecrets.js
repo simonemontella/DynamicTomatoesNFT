@@ -1,6 +1,5 @@
 const { SecretsManager } = require("@chainlink/functions-toolkit");
-const { JsonRpcProvider } = require("ethers");
-const { ethers } = require("hardhat");
+const { ethers } = require("ethers5");
 require("dotenv").config();
 
 async function hostSecrets() {
@@ -8,20 +7,22 @@ async function hostSecrets() {
     OPENWEATHER_API_KEY: process.env.OPENWEATHER_API_KEY,
   };
 
-  const [signer] = await ethers.getSigners();
   const routerAddress = "0xb83E47C2bC239B3bf370bc41e1459A34b41238D0";
   const donId = "fun-ethereum-sepolia-1";
+  const gatewayUrls = [
+    "https://01.functions-gateway.testnet.chain.link/",
+    "https://02.functions-gateway.testnet.chain.link/",
+  ];
 
-  const wallet = new ethers.Wallet(process.env.PRIVATE_KEY);
-  const nsigner = wallet.connect(
-    new JsonRpcProvider("https://eth-sepolia.g.alchemy.com/v2/demo")
-  );
-  console.log(wallet.provider);
+  const sepoliaURL = `${process.env.SEPOLIA_RPC_URL}/${process.env.ALCHEMY_API_KEY}`;
+  const provider = new ethers.providers.JsonRpcProvider(sepoliaURL);
+  const wallet = new ethers.Wallet(process.env.WALLET_SECRET, provider);
+  const signerV5 = wallet.connect(provider);
 
   const slotID = 0;
 
   const secretsManager = new SecretsManager({
-    signer: nsigner,
+    signer: signerV5,
     functionsRouterAddress: routerAddress,
     donId: donId,
   });
@@ -31,7 +32,7 @@ async function hostSecrets() {
   const uploadResult = await secretsManager.uploadEncryptedSecretsToDON({
     encryptedSecretsHexstring: encryptedSecrets.encryptedSecrets,
     gatewayUrls: gatewayUrls,
-    slotId: 0,
+    slotId: slotID,
     minutesUntilExpiration: 10,
   });
 
@@ -39,7 +40,7 @@ async function hostSecrets() {
     console.log("Errore durante il caricamento dei secrets");
   } else {
     console.log(
-      "Secrets caricati correttamente, version: ",
+      "Secrets caricati correttamente, version:",
       uploadResult.version,
       "slotID:",
       slotID
@@ -49,7 +50,4 @@ async function hostSecrets() {
   return { slotID: slotID, version: uploadResult.version };
 }
 
-hostSecrets().catch((error) => {
-  console.error(error);
-  process.exit(1);
-});
+module.exports = hostSecrets;

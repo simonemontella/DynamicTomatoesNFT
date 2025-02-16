@@ -35,7 +35,8 @@ contract ChainlinkTest is FunctionsClient, Ownable {
 
     function requestData(
         uint8 _secretsSlotID,
-        uint64 _secretsVersion
+        uint64 _secretsVersion,
+        uint32 _gasLimit
     ) external onlyOwner {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(request);
@@ -44,7 +45,7 @@ contract ChainlinkTest is FunctionsClient, Ownable {
         _sendRequest(
             req.encodeCBOR(), //CBOR = Concise Binary Object Reperesentation
             4291, //subscriptionID
-            300000, //gasLimit
+            _gasLimit, //gasLimit
             0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000 //donID
         );
     }
