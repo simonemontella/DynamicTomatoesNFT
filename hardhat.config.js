@@ -10,7 +10,7 @@ module.exports = {
     sepolia: {
       url: `${secrets.SEPOLIA_RPC_URL}/${secrets.ALCHEMY_API_KEY}`,
       accounts: [secrets.WALLET_SECRET],
-      gasLimit: 3000000,
+      //gasLimit: 3000000,
     },
   },
 };

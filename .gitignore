@@ -3,6 +3,7 @@ package.json
 
 .deps
 .git
+.states
 
 .env
 

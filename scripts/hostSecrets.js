@@ -1,6 +1,12 @@
-const { SecretsManager } = require("@chainlink/functions-toolkit");
+const {
+  SecretsManager,
+  simulateScript,
+} = require("@chainlink/functions-toolkit");
 const { ethers } = require("ethers5");
 require("dotenv").config();
+
+const fs = require("fs");
+const path = require("path");
 
 async function hostSecrets() {
   const secrets = {
@@ -46,6 +52,19 @@ async function hostSecrets() {
       slotID
     );
   }
+
+  const source = fs
+    .readFileSync(path.resolve(__dirname, "weatherRequest.js"))
+    .toString();
+
+  const response = await simulateScript({
+    source: source,
+    args: [],
+    bytesArgs: [], // bytesArgs - arguments can be encoded off-chain to bytes.
+    secrets: secrets,
+  });
+
+  console.log(response);
 
   return { slotID: slotID, version: uploadResult.version };
 }

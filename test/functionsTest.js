@@ -18,24 +18,25 @@ describe("Chainlink Functions Test", async function () {
     console.log(`https://sepolia.etherscan.io/address/${address}`);
   });*/
 
+  //https://sepolia.etherscan.io/address/0x0C96fc5FF147EE107F1e7960f2F2c3fD7d9D89bE
   //https://sepolia.etherscan.io/address/0xa3f29cfa8B773d3F59c76Da7b2b47b281d47C574
   it("Secrets upload", async function () {
     const [signer] = await ethers.getSigners();
     const contract = await ethers.getContractAt(
       "ChainlinkTest",
-      "0xa3f29cfa8B773d3F59c76Da7b2b47b281d47C574",
+      "0x0C96fc5FF147EE107F1e7960f2F2c3fD7d9D89bE",
       signer
     );
     const startTemp = await contract.temperature();
     const startHum = await contract.humidity();
     console.log("Temperature:", startTemp, "Humidity:", startHum);
     const secrets = await hostSecrets();
-    await contract.requestData(secrets.slotID, secrets.version, 800000);
+    /*await contract.requestData(secrets.slotID, secrets.version, 800000);
     console.log(
       "New Temperature:",
       await contract.temperature(),
       "New Humidity:",
       await contract.humidity()
-    );
+    );*/
   });
 });

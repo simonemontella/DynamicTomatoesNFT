@@ -1,11 +1,20 @@
 const response = await Functions.makeHttpRequest({
-  url: `https://api.openweathermap.org/data/2.5/weather`,
+  url: "https://wttr.in/Napoli",
+  method: "GET",
+  params: {
+    format: "%t:+%h",
+  },
+});
+
+/*const response = await Functions.makeHttpRequest({
+  url: "https://api.openweathermap.org/data/2.5/weather",
   method: "GET",
   params: {
     q: "Naples",
-    appid: secrets.OPENWEATHER_API_KEY,
+    appid: secrets["OPENWEATHER_API_KEY"],
+    units: "metric",
   },
-});
+});*/
 
 if (response.error) {
   throw new Error("Errore nella richiesta a OpenWeatherMap");
