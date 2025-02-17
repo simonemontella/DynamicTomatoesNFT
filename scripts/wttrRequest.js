@@ -1,6 +1,6 @@
 const wttrResult = await Functions.makeHttpRequest({
   url: "https://wttr.in/Napoli",
-  method: "GET",
+  responseType: "text",
   params: {
     format: "%t:+%h",
   },

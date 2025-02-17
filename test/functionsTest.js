@@ -1,42 +1,58 @@
+const { expect } = require("chai");
 const { ethers } = require("hardhat");
 const hostSecrets = require("../scripts/hostSecrets");
-const { expect } = require("chai");
 
-describe("Chainlink Functions Test", async function () {
-  /*it("Deployment", async function () {
-    [deployer] = await ethers.getSigners();
+//MEGLIO ESEGUIRE SU REMIX
 
-    const contractFactory = await ethers.getContractFactory("ChainlinkTest");
-    contract = await contractFactory.deploy();
+describe("ChainlinkTest Contract", function () {
+  let signer;
+  let contract;
+
+  before(async function () {
+    [signer] = await ethers.getSigners();
+
+    const ContractFactory = await ethers.getContractFactory("ChainlinkTest");
+    contract = await ContractFactory.deploy();
     await contract.waitForDeployment();
 
+    return { contract, signer };
+  });
+
+  it("Deployment dello Smart Contract", async function () {
     const address = await contract.getAddress();
-    expect(address).to.not.be.undefined;
 
-    console.log("Deployed contract");
-    console.log("CONTRACT ADDRESS:", address, "\nSIGNER:", deployer.address);
+    expect(address).to.be.properAddress;
     console.log(`https://sepolia.etherscan.io/address/${address}`);
-  });*/
+  });
 
-  //https://sepolia.etherscan.io/address/0x0C96fc5FF147EE107F1e7960f2F2c3fD7d9D89bE
-  //https://sepolia.etherscan.io/address/0xa3f29cfa8B773d3F59c76Da7b2b47b281d47C574
-  it("Secrets upload", async function () {
-    const [signer] = await ethers.getSigners();
-    const contract = await ethers.getContractAt(
-      "ChainlinkTest",
-      "0x0C96fc5FF147EE107F1e7960f2F2c3fD7d9D89bE",
-      signer
+  it("Upload Secrets & Update Dati", async function () {
+    const secrets = await hostSecrets();
+
+    expect(secrets.slotID).to.equal(0);
+    expect(secrets.version).to.be.greaterThan(0);
+
+    console.log(
+      "Secrets caricati: slotID",
+      secrets.slotID,
+      "version",
+      secrets.version
     );
+
     const startTemp = await contract.temperature();
     const startHum = await contract.humidity();
-    console.log("Temperature:", startTemp, "Humidity:", startHum);
-    const secrets = await hostSecrets();
-    /*await contract.requestData(secrets.slotID, secrets.version, 800000);
-    console.log(
-      "New Temperature:",
-      await contract.temperature(),
-      "New Humidity:",
-      await contract.humidity()
-    );*/
+
+    await contract.updateData(secrets.slotID, secrets.version);
+
+    const endTemp = await contract.temperature();
+    const endHum = await contract.humidity();
+
+    expect(endTemp).to.not.equal(startTemp);
+    expect(endHum).to.not.equal(startHum);
+
+    console.log("Temperatura iniziale:", startTemp);
+    console.log("Umidità iniziale:", startHum);
+
+    console.log("Temperatura finale:", endTemp);
+    console.log("Umidità finale:", endHum);
   });
 });

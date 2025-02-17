@@ -13,8 +13,8 @@ async function estimateGas() {
   const gasPrice = (await ethers.provider.getFeeData()).gasPrice;
   const deploymentCost = estimatedGas * gasPrice;
 
-  console.log("Quantità gas :", estimatedGas.toString());
-  console.log("Prezzo del gas:", gasPrice.toString(), "wei");
+  console.log("Quantità di gas necessaria:", estimatedGas.toString());
+  console.log("Prezzo attuale del gas:", gasPrice.toString(), "wei");
   console.log(
     "Costo stimato della distribuzione:",
     ethers.formatEther(deploymentCost),
@@ -22,7 +22,4 @@ async function estimateGas() {
   );
 }
 
-estimateGas().catch((error) => {
-  console.error(error);
-  process.exitCode = 1;
-});
+module.exports = estimateGas;

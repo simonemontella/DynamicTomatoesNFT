@@ -1,5 +1,5 @@
 IDE: 
-    - Remix Desktop
+    - Remix Desktop/Online
     - Visual Studio Code
 
 Frameworks e Strumenti:
@@ -62,6 +62,9 @@ PROBLEMI!!!!:
     - fulfillRequest non viene eseguito:
         - effettuo indagini con etherscan per controllare dove fallisce: fallisce internamente al DON
         - provo a cambiare API per wttr.in in modo da non usare API KEYs
+        -> FINALMENTE!! sbagliavo a decodificare l'output della response (abi.decode, bastava string(...))
+
+    - difficile fare splitting di stringhe on chain -> ritorno valori in bytes
 
 POSSIBILI ADD-ON:
     - non esiste implementazione di chainlink su linea

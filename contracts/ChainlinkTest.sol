@@ -10,89 +10,44 @@ contract ChainlinkTest is FunctionsClient, Ownable {
     using FunctionsRequest for FunctionsRequest.Request;
 
     address FUNCTIONS_ROUTER = 0xb83E47C2bC239B3bf370bc41e1459A34b41238D0;
-    event Debug(string message);
+
+    string public openWeatherRequest =
+        "const ethers = await import('npm:ethers@6.13.5');"
+        "const response = await Functions.makeHttpRequest({"
+        "'url': 'https://api.openweathermap.org/data/2.5/weather',"
+        "'method': 'GET',"
+        "'params': { 'q': 'Naples', 'appid': secrets.OPENWEATHER_API_KEY, 'units': 'metric' }"
+        "});"
+        "if (response.error) { throw new Error('Errore nella richiesta a OpenWeatherMap'); }"
+        "const encodedData = ethers.AbiCoder.defaultAbiCoder().encode("
+        "['uint256', 'uint256'],"
+        "[Math.round(response.data.main.temp), Math.round(response.data.main.humidity)]"
+        ");"
+        "return ethers.getBytes(encodedData);";
+
+    constructor() Ownable(msg.sender) FunctionsClient(FUNCTIONS_ROUTER) {}
 
     uint256 public temperature;
     uint256 public humidity;
 
-    string public request = 
-    "const wttrResult = await Functions.makeHttpRequest({"
-    "url: \"https://wttr.in/Napoli\","
-    "responseType: \"text\","
-    "params: {"
-    "format: \"%t:+%h\""
-    "}"
-    "});"
-
-    "if (wttrResult.error) {"
-    "throw new Error(\"Errore nella richiesta a wttr.in\");"
-    "}"
-
-    "const dataResult = {"
-    "temp: wttrResult.data.split(\":\")[0],"
-    "hum: wttrResult.data.split(\":\")[1]"
-    "};"
-
-    "return Functions.encodeString(JSON.stringify(dataResult));";
-
-
-    /*string openWeatherReq = string.concat(
-    "const response = await Functions.makeHttpRequest({",
-        "url: \"https://api.openweathermap.org/data/2.5/weather\",",
-        "method: \"GET\",",
-        "params: {",
-            "q: \"Naples\",",
-            "appid: secrets[\"OPENWEATHER_API_KEY\"],",
-            "units: \"metric\"",
-        "}",
-    "});",
-
-    "if (response.error) {",
-        "throw new Error(\"Errore nella richiesta a OpenWeatherMap\");",
-    "}",
-
-    "const dataResult = {",
-        "temp: response.data.main.temp,",
-        "hum: response.data.main.humidity",
-    "};",
-
-    "return Functions.encodeString(JSON.stringify(dataResult));"
-);*/
-
-
-    constructor() Ownable(msg.sender) FunctionsClient(FUNCTIONS_ROUTER) {}
-
-    function fakeRequest(
-        uint8 _secretsSlotID,
-        uint64 _secretsVersion,
-        uint32 _gasLimit) external onlyOwner {
-                emit Debug("Inizio richiesta");
-                emit Debug(string.concat("Parametri: ", 
-                            Strings.toString(_secretsSlotID), ",", 
-                            Strings.toString(_secretsVersion), ",", 
-                            Strings.toString(_gasLimit)));
-    }
+    event Debug(string message);
 
     function updateData(
-        //uint8 _secretsSlotID,
-        //uint64 _secretsVersion,
-        uint32 _gasLimit) external onlyOwner {
+        uint8 _secretsSlotID,
+        uint64 _secretsVersion
+    ) external onlyOwner {
         emit Debug("invio richiesta");
-        emit Debug(string.concat("parametri (", 
-                    //Strings.toString(_secretsSlotID), ",", 
-                    //Strings.toString(_secretsVersion), ",", 
-                    Strings.toString(_gasLimit), ")"));
-        
-        FunctionsRequest.Request memory req;
-        req.initializeRequestForInlineJavaScript(request);
 
-        /*emit Debug("aggiungo secrets dal DON");
-        req.addDONHostedSecrets(_secretsSlotID, _secretsVersion);*/
+        FunctionsRequest.Request memory req;
+        req.initializeRequestForInlineJavaScript(openWeatherRequest);
+
+        emit Debug("aggiungo secrets dal DON");
+        req.addDONHostedSecrets(_secretsSlotID, _secretsVersion);
 
         _sendRequest(
             req.encodeCBOR(), //CBOR = Concise Binary Object Reperesentation
             4291, //subscriptionID
-            _gasLimit, //gasLimit
+            300000, //gasLimit
             0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000 //donID
         );
 
@@ -110,11 +65,18 @@ contract ChainlinkTest is FunctionsClient, Ownable {
             revert("Errore nella risposta da Chainlink Functions");
         }
 
-        emit Debug(string(response));
-        //(int256 temp, int256 hum) = abi.decode(response, (int256, int256));
+        (uint256 temp, uint256 hum) = abi.decode(response, (uint256, uint256));
 
-        //temperature = uint256(temp);
-        //humidity = uint256(hum);
+        temperature = temp;
+        humidity = hum;
+
+        emit Debug(
+            string.concat(
+                "temperature: ",
+                Strings.toString(temp),
+                " humidity: ",
+                Strings.toString(humidity)
+            )
+        );
     }
-
 }

@@ -3,7 +3,7 @@ package.json
 
 .deps
 .git
-.states
+.states/
 
 .env
 
