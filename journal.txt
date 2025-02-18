@@ -64,7 +64,8 @@ PROBLEMI!!!!:
         - provo a cambiare API per wttr.in in modo da non usare API KEYs
         -> FINALMENTE!! sbagliavo a decodificare l'output della response (abi.decode, bastava string(...))
 
-    - difficile fare splitting di stringhe on chain -> ritorno valori in bytes
+    - difficile fare splitting di stringhe on chain 
+    https://docs.chain.link/chainlink-functions/tutorials/abi-decoding
 
 POSSIBILI ADD-ON:
     - non esiste implementazione di chainlink su linea
