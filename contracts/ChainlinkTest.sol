@@ -5,7 +5,6 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Strings.sol";
 import "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";
 import "@chainlink/contracts/src/v0.8/functions/v1_0_0/libraries/FunctionsRequest.sol";
-
 contract ChainlinkTest is FunctionsClient, Ownable {
     using FunctionsRequest for FunctionsRequest.Request;
 

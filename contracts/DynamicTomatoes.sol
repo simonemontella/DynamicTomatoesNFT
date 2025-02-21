@@ -3,13 +3,10 @@ pragma solidity ^0.8.28;
 
 import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
 import "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";
-import "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsRequest.sol";
 
 contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     using FunctionsRequest for FunctionsRequest.Request;
-    using Counters for Counters.Counter;
 
     address FUNCTIONS_ROUTER = 0xb83E47C2bC239B3bf370bc41e1459A34b41238D0;
     string public dataRequest =
@@ -35,10 +32,15 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     ];
 
     uint8 public constant TOMATO_STAGES_COUNT = 5;
+    uint8 public constant MIN_FAVORABLE_TEMPERATURE = 10;
+    uint8 public constant MAX_FAVORABLE_TEMPERATURE = 30;
+    uint8 public constant MIN_FAVORABLE_HUMIDITY = 40;
+    uint8 public constant MAX_FAVORABLE_HUMIDITY = 80;
 
-    Counters.Counter _tokenIds;
-    mapping(uint256 => uint256) weatherRequests;
-    mapping(uint256 => uint8) tomatoesStages;
+    uint256 private _tomatoesIds;
+    mapping(uint256 => uint8) private _tomatoesStages;
+    mapping(bytes32 => uint256) private _updateRequests;
+    mapping(uint256 => address) private _tomatoOwners;
 
     constructor()
         ERC721("DynamicTomatoes", "DT")
@@ -46,37 +48,50 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         Ownable(msg.sender)
     {}
 
-    function mint() public onlyOwner {}
+    function mint() public {
+        uint256 tomatoId = _tomatoesIds;
 
-    function grow(uint256 _tokenId) public {}
+        _safeMint(msg.sender, tomatoId);
+        _tomatoOwners[tomatoId] = msg.sender;
+        _setStage(tomatoId, 0);
 
-    function safeGrow(
-        uint256 _tokenId,
-        uint256 temp,
-        uint256 hum
-    ) public onlyOwner {}
+        _tomatoesIds++;
+    }
 
-    function forceGrow(uint256 _tokenId, uint8 _stage) public onlyOwner {}
+    function forceGrow(
+        uint256 _tomatoId,
+        uint256 _temperature,
+        uint256 _humidity
+    ) public onlyAdminOrTomatoOwner(_tomatoId) growableTomato(_tomatoId) {
+        if (_isWeatherFavorable(_temperature, _humidity)) {
+            _setStage(_tomatoId, _tomatoesStages[_tomatoId] + 1);
+        } else {
+            revert("weather conditions are not favorable");
+        }
+    }
 
-    function setStage(uint256 _tokenId, uint8 _stage) internal {}
+    function _setStage(uint256 _tomatoId, uint8 _stage) internal {
+        _tomatoesStages[_tomatoId] = _stage;
+        _setTokenURI(_tomatoId, ipfsImages[_stage]);
+    }
 
-    function requestUpdate(
-        uint256 _tokenId,
+    function tryGrow(
+        uint256 _tomatoId,
         uint8 _secretsSlotID,
         uint64 _secretsVersion
-    ) internal {
+    ) public onlyAdminOrTomatoOwner(_tomatoId) growableTomato(_tomatoId) {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(dataRequest);
         req.addDONHostedSecrets(_secretsSlotID, _secretsVersion);
 
-        _sendRequest(
+        bytes32 requestId = _sendRequest(
             req.encodeCBOR(),
             4291,
             300000,
-            0x66756e2d657468657265756d2d7365706f6f6c69612d3100000000000000000000
+            0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000
         );
 
-        weatherRequests[_tokenId] = uint256(req.id);
+        _updateRequests[requestId] = _tomatoId;
     }
 
     function fulfillRequest(
@@ -89,5 +104,35 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         }
 
         (uint256 temp, uint256 hum) = abi.decode(response, (uint256, uint256));
+        uint256 tomatoId = _updateRequests[requestId];
+
+        forceGrow(tomatoId, temp, hum);
+    }
+
+    function _isWeatherFavorable(
+        uint256 temperature,
+        uint256 humidity
+    ) internal pure returns (bool) {
+        return
+            (temperature > MIN_FAVORABLE_TEMPERATURE &&
+                temperature < MAX_FAVORABLE_HUMIDITY) &&
+            (humidity > MIN_FAVORABLE_HUMIDITY &&
+                humidity < MAX_FAVORABLE_HUMIDITY);
+    }
+
+    modifier onlyAdminOrTomatoOwner(uint256 _tomatoId) {
+        require(
+            msg.sender == _tomatoOwners[_tomatoId] || msg.sender == owner(),
+            "only the tomato owner can grow it"
+        );
+        _;
+    }
+
+    modifier growableTomato(uint256 _tomatoId) {
+        require(
+            _tomatoesStages[_tomatoId] < TOMATO_STAGES_COUNT,
+            "tomato is fully grown"
+        );
+        _;
     }
 }
