@@ -12,17 +12,6 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     using Counters for Counters.Counter;
 
     address FUNCTIONS_ROUTER = 0xb83E47C2bC239B3bf370bc41e1459A34b41238D0;
-
-    Counters.Counter private _tokenIdCounter;
-
-    constructor()
-        ERC721("DynamicTomatoes", "DT")
-        FunctionsClient(FUNCTIONS_ROUTER)
-        Ownable(msg.sender)
-    {}
-
-    function grow(uint256 _tokenId) public {}
-
     string public dataRequest =
         "const ethers = await import('npm:ethers@6.13.5');"
         "const response = await Functions.makeHttpRequest({"
@@ -37,10 +26,45 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         ");"
         "return ethers.getBytes(encodedData);";
 
-    function updateData(
+    string[5] private ipfsImages = [
+        "ipfs://bafkreiez5dbnt2wfvy2l62jj47cd5m55evs5xy3lgwl2ebvb4i33v362ja",
+        "ipfs://bafkreifh6bmq55bfakggwyfakopgozzblw3tfbezzc3oop2efkd5h46kca",
+        "ipfs://bafkreibb2rbzv3uiapbgdagp2u7usyr2pj2i3tdwkjwvfh6a7i2eumag2e",
+        "ipfs://bafkreih5ksj6jriiheb3benmybxyccdjlq4vnzn4bnnooftecwcomwj2xu",
+        "ipfs://bafkreieye4bba5ntf2j657nuzx2xa3jeojkfmvez7p3s7znnkrig7e4nh4"
+    ];
+
+    uint8 public constant TOMATO_STAGES_COUNT = 5;
+
+    Counters.Counter _tokenIds;
+    mapping(uint256 => uint256) weatherRequests;
+    mapping(uint256 => uint8) tomatoesStages;
+
+    constructor()
+        ERC721("DynamicTomatoes", "DT")
+        FunctionsClient(FUNCTIONS_ROUTER)
+        Ownable(msg.sender)
+    {}
+
+    function mint() public onlyOwner {}
+
+    function grow(uint256 _tokenId) public {}
+
+    function safeGrow(
+        uint256 _tokenId,
+        uint256 temp,
+        uint256 hum
+    ) public onlyOwner {}
+
+    function forceGrow(uint256 _tokenId, uint8 _stage) public onlyOwner {}
+
+    function setStage(uint256 _tokenId, uint8 _stage) internal {}
+
+    function requestUpdate(
+        uint256 _tokenId,
         uint8 _secretsSlotID,
         uint64 _secretsVersion
-    ) external onlyOwner {
+    ) internal {
         FunctionsRequest.Request memory req;
         req.initializeRequestForInlineJavaScript(dataRequest);
         req.addDONHostedSecrets(_secretsSlotID, _secretsVersion);
@@ -51,6 +75,8 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
             300000,
             0x66756e2d657468657265756d2d7365706f6f6c69612d3100000000000000000000
         );
+
+        weatherRequests[_tokenId] = uint256(req.id);
     }
 
     function fulfillRequest(
@@ -59,7 +85,7 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         bytes memory err
     ) internal override {
         if (err.length > 0) {
-            revert("cannot get weather data");
+            revert("cannot verify weather data due to an error");
         }
 
         (uint256 temp, uint256 hum) = abi.decode(response, (uint256, uint256));
