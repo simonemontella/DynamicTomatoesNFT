@@ -9,7 +9,7 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     using FunctionsRequest for FunctionsRequest.Request;
 
     address FUNCTIONS_ROUTER = 0xb83E47C2bC239B3bf370bc41e1459A34b41238D0;
-    string public dataRequest =
+    string dataRequest =
         "const ethers = await import('npm:ethers@6.13.5');"
         "const response = await Functions.makeHttpRequest({"
         "'url': 'https://api.openweathermap.org/data/2.5/weather',"
@@ -23,12 +23,12 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         ");"
         "return ethers.getBytes(encodedData);";
 
-    string[5] private ipfsImages = [
-        "ipfs://bafkreiez5dbnt2wfvy2l62jj47cd5m55evs5xy3lgwl2ebvb4i33v362ja",
-        "ipfs://bafkreifh6bmq55bfakggwyfakopgozzblw3tfbezzc3oop2efkd5h46kca",
-        "ipfs://bafkreibb2rbzv3uiapbgdagp2u7usyr2pj2i3tdwkjwvfh6a7i2eumag2e",
-        "ipfs://bafkreih5ksj6jriiheb3benmybxyccdjlq4vnzn4bnnooftecwcomwj2xu",
-        "ipfs://bafkreieye4bba5ntf2j657nuzx2xa3jeojkfmvez7p3s7znnkrig7e4nh4"
+    string[5] private metadata = [
+        "ipfs://bafkreihckbanskuhuxrzis7fqplfv7ol3uj64ztg6ullgje4xineynfjuu",
+        "ipfs://bafkreid4pkgdc7qxrmsq4ab7r63rof76budicrvvocqvuejnpwkso37uzm",
+        "ipfs://bafkreihdvuyurrsa26723trpt4vhntj42syeeb7o4lp3v7fyn7tleyynve",
+        "ipfs://bafkreig5gfybheg2p2546gqhpyz3g5t6hgax7xqtfoxhe56sts67bprjj4",
+        "ipfs://bafkreib4ielhjes3g3rgb2pmh63gftrp4uku4gb573gcbcqw7drqxnnfqu"
     ];
 
     uint8 public constant TOMATO_STAGES_COUNT = 5;
@@ -58,6 +58,16 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         _tomatoesIds++;
     }
 
+    function getStage(uint256 _tomatoId) public view returns (uint8) {
+        return _tomatoesStages[_tomatoId];
+    }
+
+    function adminGrow(
+        uint256 _tomatoId
+    ) public onlyOwner growableTomato(_tomatoId) {
+        _setStage(_tomatoId, _tomatoesStages[_tomatoId] + 1);
+    }
+
     function forceGrow(
         uint256 _tomatoId,
         uint256 _temperature,
@@ -72,7 +82,7 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
 
     function _setStage(uint256 _tomatoId, uint8 _stage) internal {
         _tomatoesStages[_tomatoId] = _stage;
-        _setTokenURI(_tomatoId, ipfsImages[_stage]);
+        _setTokenURI(_tomatoId, metadata[_stage]);
     }
 
     function tryGrow(

@@ -27,12 +27,45 @@ async function upload() {
     const uploadResult = await pinata.upload.file(file).group(group.id);
     console.log(uploadResult);
 
-    uploads[imgFileName] = "ipfs://" + uploadResult.IpfsHash;
+    const imageUrl = "ipfs://" + uploadResult.IpfsHash;
+
+    const stage = imgFileName.replace("stage-", "").replace(".png", "");
+
+    const metadata = {
+      name: `Tomato - Stage ${stage}`,
+      description: `Tomato at stage ${stage}`,
+      image: imageUrl,
+      attributes: [
+        {
+          trait_type: "Stage",
+          value: stage,
+        },
+      ],
+    };
+
+    const metadataBlob = new Blob([JSON.stringify(metadata)], {
+      type: "application/json",
+    });
+    const metadataFile = new File(
+      [metadataBlob],
+      `${imgFileName.replace(".png", "")}.json`
+    );
+
+    const metadataUploadResult = await pinata.upload
+      .file(metadataFile)
+      .group(group.id);
+    console.log(metadataUploadResult);
+
+    uploads[imgFileName] = {
+      image: imageUrl,
+      metadata: "ipfs://" + metadataUploadResult.IpfsHash,
+    };
   }
 
   const destPath = path.join(__dirname, "../ipfs-uploads.json");
   try {
-    fs.writeFileSync(destPath, JSON.stringify(uploads), { flag: "a" });
+    fs.writeFileSync(destPath, JSON.stringify(uploads, null, 2), { flag: "a" });
+    console.log("Uploads saved to ipfs-uploads.json");
   } catch (err) {
     console.error(err);
   }

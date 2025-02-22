@@ -20,10 +20,17 @@ async function estimateGas(contractName, gasPrice) {
 }
 
 async function estimateContracts() {
+  const network = await ethers.provider.getNetwork();
   const gasPrice = (await ethers.provider.getFeeData()).gasPrice;
   const contracts = ["ChainlinkTest", "DynamicTomatoes"];
 
-  console.log("Prezzo attuale del gas:", gasPrice.toString(), "wei");
+  console.log(
+    "Prezzo attuale del gas su",
+    network.name,
+    ":",
+    gasPrice.toString(),
+    "wei"
+  );
   for (const contract of contracts) {
     console.log(`Stima dei costi per il contratto ${contract}`);
     await estimateGas(contract, gasPrice);

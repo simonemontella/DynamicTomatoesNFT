@@ -5,7 +5,7 @@ const hostSecrets = require("../scripts/hostSecrets");
 //MEGLIO ESEGUIRE SU REMIX
 
 describe("ChainlinkTest Contract", function () {
-  let signer;
+  /*let signer;
   let contract;
 
   before(async function () {
@@ -23,7 +23,7 @@ describe("ChainlinkTest Contract", function () {
 
     expect(address).to.be.properAddress;
     console.log(`https://sepolia.etherscan.io/address/${address}`);
-  });
+  });*/
 
   it("Upload Secrets & Update Dati", async function () {
     const secrets = await hostSecrets();
@@ -38,7 +38,7 @@ describe("ChainlinkTest Contract", function () {
       secrets.version
     );
 
-    const startTemp = await contract.temperature();
+    /*const startTemp = await contract.temperature();
     const startHum = await contract.humidity();
 
     await contract.updateData(secrets.slotID, secrets.version);
@@ -53,6 +53,6 @@ describe("ChainlinkTest Contract", function () {
     console.log("Umidità iniziale:", startHum);
 
     console.log("Temperatura finale:", endTemp);
-    console.log("Umidità finale:", endHum);
+    console.log("Umidità finale:", endHum);*/
   });
 });

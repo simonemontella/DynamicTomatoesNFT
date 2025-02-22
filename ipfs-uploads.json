@@ -1,7 +1,22 @@
 {
-    "stage-1.png": "ipfs://bafkreiez5dbnt2wfvy2l62jj47cd5m55evs5xy3lgwl2ebvb4i33v362ja",
-    "stage-2.png": "ipfs://bafkreifh6bmq55bfakggwyfakopgozzblw3tfbezzc3oop2efkd5h46kca",
-    "stage-3.png": "ipfs://bafkreibb2rbzv3uiapbgdagp2u7usyr2pj2i3tdwkjwvfh6a7i2eumag2e",
-    "stage-4.png": "ipfs://bafkreih5ksj6jriiheb3benmybxyccdjlq4vnzn4bnnooftecwcomwj2xu",
-    "stage-5.png": "ipfs://bafkreieye4bba5ntf2j657nuzx2xa3jeojkfmvez7p3s7znnkrig7e4nh4"
+    "stage-1.png": {
+        "image": "ipfs://bafkreiez5dbnt2wfvy2l62jj47cd5m55evs5xy3lgwl2ebvb4i33v362ja",
+        "metadata": "ipfs://bafkreihckbanskuhuxrzis7fqplfv7ol3uj64ztg6ullgje4xineynfjuu"
+    },
+    "stage-2.png": {
+        "image": "ipfs://bafkreifh6bmq55bfakggwyfakopgozzblw3tfbezzc3oop2efkd5h46kca",
+        "metadata": "ipfs://bafkreid4pkgdc7qxrmsq4ab7r63rof76budicrvvocqvuejnpwkso37uzm"
+    },
+    "stage-3.png": {
+        "image": "ipfs://bafkreibb2rbzv3uiapbgdagp2u7usyr2pj2i3tdwkjwvfh6a7i2eumag2e",
+        "metadata": "ipfs://bafkreihdvuyurrsa26723trpt4vhntj42syeeb7o4lp3v7fyn7tleyynve"
+    },
+    "stage-4.png": {
+        "image": "ipfs://bafkreih5ksj6jriiheb3benmybxyccdjlq4vnzn4bnnooftecwcomwj2xu",
+        "metadata": "ipfs://bafkreig5gfybheg2p2546gqhpyz3g5t6hgax7xqtfoxhe56sts67bprjj4"
+    },
+    "stage-5.png": {
+        "image": "ipfs://bafkreieye4bba5ntf2j657nuzx2xa3jeojkfmvez7p3s7znnkrig7e4nh4",
+        "metadata": "ipfs://bafkreib4ielhjes3g3rgb2pmh63gftrp4uku4gb573gcbcqw7drqxnnfqu"
+    }
 }

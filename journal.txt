@@ -13,9 +13,10 @@ Frameworks e Strumenti:
     Storage metadati NFT: *sarebbe costoso salvarli on-chain
         - IPFS: InterPlanetary File System
         - Pinata: facilita l'accesso ad IPFS con API semplici
+        https://blog.chain.link/build-deploy-and-sell-your-own-dynamic-nft/
     
     IoT Data:
-        - OpenWheatherMap
+        - OpenWeatherMap
         - wttr.in
 
     Librerie Solidity:
@@ -66,6 +67,8 @@ PROBLEMI!!!!:
 
     - difficile fare splitting di stringhe on chain 
     https://docs.chain.link/chainlink-functions/tutorials/abi-decoding
+
+    - inizialmente ho caricato solo le immagini e non anche i metadati json
 
 POSSIBILI ADD-ON:
     - non esiste implementazione di chainlink su linea
