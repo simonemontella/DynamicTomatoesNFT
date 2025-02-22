@@ -5,6 +5,7 @@ pinata.txt
 .deps
 .git
 .states/
+.debug/
 
 .env
 

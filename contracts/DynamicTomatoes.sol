@@ -8,6 +8,14 @@ import "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";
 contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     using FunctionsRequest for FunctionsRequest.Request;
 
+    event TomatoMinted(uint256 tomatoId, address owner);
+    event TomatoGrown(uint256 tomatoId, uint8 stage);
+    event TomatoGrowthRequest(uint256 tomatoId, bytes32 requestId);
+    event WeatherDataReceived(uint256 temperature, uint256 humidity);
+    event Debug(string msg);
+
+    uint8 public constant VERSION = 2;
+
     address FUNCTIONS_ROUTER = 0xb83E47C2bC239B3bf370bc41e1459A34b41238D0;
     string dataRequest =
         "const ethers = await import('npm:ethers@6.13.5');"
@@ -52,10 +60,13 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         uint256 tomatoId = _tomatoesIds;
 
         _safeMint(msg.sender, tomatoId);
+        emit Debug("minted");
         _tomatoOwners[tomatoId] = msg.sender;
         _setStage(tomatoId, 0);
 
         _tomatoesIds++;
+        emit Debug("incremented counter");
+        emit TomatoMinted(tomatoId, msg.sender);
     }
 
     function getStage(uint256 _tomatoId) public view returns (uint8) {
@@ -72,20 +83,20 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         uint256 _tomatoId,
         uint256 _temperature,
         uint256 _humidity
-    ) public onlyAdminOrTomatoOwner(_tomatoId) growableTomato(_tomatoId) {
-        if (_isWeatherFavorable(_temperature, _humidity)) {
-            _setStage(_tomatoId, _tomatoesStages[_tomatoId] + 1);
-        } else {
-            revert("weather conditions are not favorable");
-        }
+    ) public onlyOwner growableTomato(_tomatoId) {
+        tryWeatherGrow(_tomatoId, _temperature, _humidity);
     }
 
     function _setStage(uint256 _tomatoId, uint8 _stage) internal {
+        emit Debug("set stage");
+
         _tomatoesStages[_tomatoId] = _stage;
         _setTokenURI(_tomatoId, metadata[_stage]);
+
+        emit TomatoGrown(_tomatoId, _stage);
     }
 
-    function tryGrow(
+    function grow(
         uint256 _tomatoId,
         uint8 _secretsSlotID,
         uint64 _secretsVersion
@@ -101,7 +112,10 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
             0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000
         );
 
+        emit Debug("request sent");
         _updateRequests[requestId] = _tomatoId;
+        emit Debug("request saved");
+        emit TomatoGrowthRequest(_tomatoId, requestId);
     }
 
     function fulfillRequest(
@@ -109,14 +123,29 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         bytes memory response,
         bytes memory err
     ) internal override {
+        emit Debug("request fulfilled");
         if (err.length > 0) {
+            emit Debug(string.concat("ERROR: ", string(err)));
             revert("cannot verify weather data due to an error");
         }
 
+        emit Debug(string.concat("RESPONSE: ", string(response)));
         (uint256 temp, uint256 hum) = abi.decode(response, (uint256, uint256));
+        emit WeatherDataReceived(temp, hum);
         uint256 tomatoId = _updateRequests[requestId];
 
-        forceGrow(tomatoId, temp, hum);
+        tryWeatherGrow(tomatoId, temp, hum);
+    }
+
+    function tryWeatherGrow(uint256 _tomatoId, uint256 _temperature, uint256 _humidity) internal {
+        emit Debug("weather test");
+        if (_isWeatherFavorable(_temperature, _humidity)) {
+            emit Debug("weather ok");
+            _setStage(_tomatoId, _tomatoesStages[_tomatoId] + 1);
+        } else {
+            emit Debug("weather fail");
+            revert("weather conditions are not favorable");
+        }
     }
 
     function _isWeatherFavorable(
@@ -125,7 +154,7 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     ) internal pure returns (bool) {
         return
             (temperature > MIN_FAVORABLE_TEMPERATURE &&
-                temperature < MAX_FAVORABLE_HUMIDITY) &&
+                temperature < MAX_FAVORABLE_TEMPERATURE) &&
             (humidity > MIN_FAVORABLE_HUMIDITY &&
                 humidity < MAX_FAVORABLE_HUMIDITY);
     }
