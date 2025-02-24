@@ -1,12 +1,11 @@
 import './App.css'
 import { ThemeProvider as MUIThemeProvider, CssBaseline, Button } from '@mui/material';
-import { getTheme } from './theme/theme';
-import { Layout } from './theme/Layout';
 import { Box, Typography, } from '@mui/material';
 import { useAccount } from 'wagmi';
-import { ThemeProvider } from './theme/ThemeContext';
-import { useThemeMode } from './theme/ThemeContext';
+import { getTheme, useThemeMode, ThemeProvider } from './theme/Theme';
+import { Layout } from './theme/Layout';
 import { TomatoesBox } from './components/TomatoesBox';
+import { plantTomato } from './chain/TomatoesContract';
 
 const Home = () => {
   const { isConnected } = useAccount();
@@ -37,7 +36,8 @@ const Home = () => {
         <>
           <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Typography variant="h3">Your Tomatoes</Typography>
-            <Button variant="contained" color="primary" size="large">
+            <Button variant="contained" color="primary" size="large"
+              onClick={() => { plantTomato() }}>
               Plant New Tomato 🌱
             </Button>
           </Box>
@@ -47,6 +47,7 @@ const Home = () => {
     </Box>
   );
 };
+
 
 const AppContent = () => {
   const { mode } = useThemeMode();

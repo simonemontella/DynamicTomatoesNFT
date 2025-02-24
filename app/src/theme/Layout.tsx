@@ -2,7 +2,7 @@ import { Box, Container, IconButton, Typography } from '@mui/material';
 import { Navbar } from './Navbar';
 import { ReactNode } from 'react';
 import { Brightness4, Brightness7 } from '@mui/icons-material';
-import { useThemeMode } from './ThemeContext';
+import { useThemeMode } from './Theme';
 
 interface LayoutProps {
   children: ReactNode;

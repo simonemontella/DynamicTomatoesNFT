@@ -8,15 +8,29 @@ import "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";
 contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     using FunctionsRequest for FunctionsRequest.Request;
 
+    /*struct WeatherRequest {
+        uint256 temperature;
+        uint256 humidity;
+        bytes32 requestId;
+        uint256 tomatoId;
+        address sender;
+    }
+
+    WeatherRequest lastRequest;*/
+
     event TomatoMinted(uint256 tomatoId, address owner);
     event TomatoGrown(uint256 tomatoId, uint8 stage);
     event TomatoGrowthRequest(uint256 tomatoId, bytes32 requestId);
     event WeatherDataReceived(uint256 temperature, uint256 humidity);
     event Debug(string msg);
 
-    uint8 public constant VERSION = 2;
+    uint8 public constant VERSION = 4;
 
+    /* CHAINLINK */
     address FUNCTIONS_ROUTER = 0xb83E47C2bC239B3bf370bc41e1459A34b41238D0;
+    bytes32 DON_ID = 0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000;
+    uint32 GAS_LIMIT = 300000;
+    uint64 SUBSCRIPTION_ID = 4291; //4351 deployment
     string dataRequest =
         "const ethers = await import('npm:ethers@6.13.5');"
         "const response = await Functions.makeHttpRequest({"
@@ -64,9 +78,9 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         _tomatoOwners[tomatoId] = msg.sender;
         _setStage(tomatoId, 0);
 
+        emit TomatoMinted(tomatoId, msg.sender);
         _tomatoesIds++;
         emit Debug("incremented counter");
-        emit TomatoMinted(tomatoId, msg.sender);
     }
 
     function getStage(uint256 _tomatoId) public view returns (uint8) {
@@ -107,9 +121,9 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
 
         bytes32 requestId = _sendRequest(
             req.encodeCBOR(),
-            4291,
-            300000,
-            0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000
+            SUBSCRIPTION_ID,
+            GAS_LIMIT,
+            DON_ID
         );
 
         emit Debug("request sent");
@@ -137,7 +151,11 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         tryWeatherGrow(tomatoId, temp, hum);
     }
 
-    function tryWeatherGrow(uint256 _tomatoId, uint256 _temperature, uint256 _humidity) internal {
+    function tryWeatherGrow(
+        uint256 _tomatoId,
+        uint256 _temperature,
+        uint256 _humidity
+    ) internal {
         emit Debug("weather test");
         if (_isWeatherFavorable(_temperature, _humidity)) {
             emit Debug("weather ok");
@@ -162,14 +180,14 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     modifier onlyAdminOrTomatoOwner(uint256 _tomatoId) {
         require(
             msg.sender == _tomatoOwners[_tomatoId] || msg.sender == owner(),
-            "only the tomato owner can grow it"
+            "only the tomato owner (or admin) can grow it"
         );
         _;
     }
 
     modifier growableTomato(uint256 _tomatoId) {
         require(
-            _tomatoesStages[_tomatoId] < TOMATO_STAGES_COUNT,
+            (_tomatoesStages[_tomatoId] + 1) < TOMATO_STAGES_COUNT,
             "tomato is fully grown"
         );
         _;

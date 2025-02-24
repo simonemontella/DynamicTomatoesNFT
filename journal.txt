@@ -9,6 +9,11 @@ Frameworks e Strumenti:
     
     Frontend:
         - React
+        - Vite (setup React moderno, veloce e lightweight)
+        - WAGMI
+        https://wagmi.sh/react/getting-started
+        - MUI
+        - TanStack 
 
     Storage metadati NFT: *sarebbe costoso salvarli on-chain
         - IPFS: InterPlanetary File System
@@ -38,6 +43,8 @@ Frameworks e Strumenti:
 
     Librerie JS:
         - Ethers: permette di interagire con la blockchain di ethereum (è inclusa in hardhat)
+        - Alchemy
+        https://docs.alchemy.com/docs/how-to-get-all-nfts-owned-by-an-address
 
 Blockchain:
     - Sepolia: testnet di ethereum
@@ -49,7 +56,7 @@ Wallet:
 Struttura files:
     - contracts/ : contiene il codice Solidity degli SC (logica on-chain)
     - test/ : contiene i file js per i vari test 
-    - ignition/ : dovrebbe contenere i moduli del deploy
+    - frontend/ : contiene il codice della piattaforma implementata per interagire con il contratto
     - scripts/ : contiene alcuni script js di utility
     - / : contiene i vari moduli per node.js e il file secrets
 

@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, } from '@mui/material';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { metaMaskConnector } from '../chain/Wagmi';
-import { useThemeMode } from './ThemeContext';
+import { useThemeMode } from './Theme';
 
 export const Navbar = () => {
   const { mode } = useThemeMode();

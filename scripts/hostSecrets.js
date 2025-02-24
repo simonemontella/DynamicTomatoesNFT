@@ -1,5 +1,5 @@
 const { SecretsManager } = require("@chainlink/functions-toolkit");
-const { ethers } = require("ethers5");
+const ethers = require("ethers5");
 require("dotenv").config();
 
 async function hostSecrets() {
