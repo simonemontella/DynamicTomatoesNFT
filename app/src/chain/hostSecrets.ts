@@ -7,6 +7,7 @@ async function hostSecrets(): Promise<{ slotID: number; version: bigint }> {
         }
 
         const data = await response.json();
+        console.log('Secrets uploaded:', data);
         return {
             slotID: data.slotID,
             version: BigInt(data.version)

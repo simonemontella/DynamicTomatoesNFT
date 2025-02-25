@@ -46,6 +46,9 @@ app.get("/get", async (_, res) => {
       throw new Error("Failed to upload secrets");
     }
 
+    console.log("Secrets uploaded successfully");
+    console.log("Slot ID:", slotID);
+    console.log("Version:", uploadResult.version);
     res.json({
       slotID: slotID,
       version: uploadResult.version,

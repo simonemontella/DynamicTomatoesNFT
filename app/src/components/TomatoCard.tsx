@@ -1,8 +1,8 @@
-import { Card, CardContent, Typography, CircularProgress, Box, Button, Dialog, DialogTitle, DialogContent } from '@mui/material';
+import { Card, CardContent, Typography, CircularProgress, Box, Button } from '@mui/material';
 import { OwnedNft } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
-import { useWriteContract } from 'wagmi';
-import { growTomato } from '../chain/TomatoesContract';
+import { growTomato } from '../chain/TomatoesManager';
+import { ActionDialog } from './ActionDialog';
 
 interface TomatoCardProps {
     tomato: OwnedNft;
@@ -14,8 +14,7 @@ export const TomatoCard = ({ tomato }: TomatoCardProps) => {
     const stage = tomato.raw.metadata.attributes.find((attr: any) => attr.trait_type === 'Stage').value;
 
     const [image, setImage] = useState<string | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [dialogOpen, setDialogOpen] = useState(false);
+    const [downloading, setDownloading] = useState<boolean>(true);
 
     useEffect(() => {
         const fetchImage = async () => {
@@ -30,18 +29,27 @@ export const TomatoCard = ({ tomato }: TomatoCardProps) => {
             } catch (error) {
                 console.error('Error fetching tomato image:', error);
             }
-            setLoading(false);
+            setDownloading(false);
         };
 
         fetchImage();
     }, [imageUrl]);
+
+    const { grow, isLoading: growLoading, isError, isSuccess, status: growStatus, error: growError } = growTomato(Number(id));
+    const [dialogOpen, setDialogOpen] = useState(false);
+
+    const handleClose = () => {
+        if (!growLoading) {
+            setDialogOpen(false);
+        }
+    };
 
     return (
         <>
             <Card>
                 <CardContent>
                     <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200, mb: 2 }}>
-                        {loading ? (
+                        {downloading ? (
                             <CircularProgress />
                         ) : (
                             image ? (
@@ -64,26 +72,23 @@ export const TomatoCard = ({ tomato }: TomatoCardProps) => {
                         variant="contained"
                         color="primary"
                         sx={{ mt: 2 }}
-                        onClick={() => { }}>
-                        GROW
+                        onClick={() => { setDialogOpen(true) }}>
+                        REQUEST GROW
                     </Button>
+
+                    <ActionDialog
+                        open={dialogOpen}
+                        action={grow}
+                        title={`REQUESTING TOMATO #${id} GROW`}
+                        message={growStatus!}
+                        error={growError!}
+                        isError={isError}
+                        isSuccess={isSuccess}
+                        isLoading={growLoading}
+                        onClose={handleClose}
+                    />
                 </CardContent>
             </Card >
-
-            <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)}>
-                <DialogTitle>Growing Tomato #{id}</DialogTitle>
-                <DialogContent>
-                    <Box sx={{ p: 2, textAlign: 'center' }}>
-                        {growthLoading ? (
-                            <CircularProgress />
-                        ) : growthError ? (
-                            <Typography color="error">{growthError}</Typography>
-                        ) : (
-                            <Typography>Your tomato is growing! Check back soon to see its progress.</Typography>
-                        )}
-                    </Box>
-                </DialogContent>
-            </Dialog>
         </>
     );
 };

@@ -5,7 +5,7 @@ import { useAccount } from 'wagmi';
 import { getTheme, useThemeMode, ThemeProvider } from './theme/Theme';
 import { Layout } from './theme/Layout';
 import { TomatoesBox } from './components/TomatoesBox';
-import { plantTomato } from './chain/TomatoesContract';
+import { plantTomato } from './chain/TomatoesManager';
 
 const Home = () => {
   const { isConnected } = useAccount();

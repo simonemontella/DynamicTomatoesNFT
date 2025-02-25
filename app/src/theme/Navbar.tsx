@@ -43,7 +43,8 @@ export const Navbar = () => {
     const fetchWeather = async () => {
       try {
         const response = await fetch('https://wttr.in/Naples?format=%l,+%c+T:%t+H:%h');
-        setWeather(await response.text());
+        const result = await response.text();
+        setWeather(result.startsWith('Unknown location') ? 'Weather data unavailable' : result);
       } catch (error) {
         setWeather('Error fetching weather data');
         console.error('Error fetching weather data:', error);

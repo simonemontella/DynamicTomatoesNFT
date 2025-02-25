@@ -8,29 +8,19 @@ import "@chainlink/contracts/src/v0.8/functions/v1_0_0/FunctionsClient.sol";
 contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     using FunctionsRequest for FunctionsRequest.Request;
 
-    /*struct WeatherRequest {
-        uint256 temperature;
-        uint256 humidity;
-        bytes32 requestId;
-        uint256 tomatoId;
-        address sender;
-    }
-
-    WeatherRequest lastRequest;*/
-
-    event TomatoMinted(uint256 tomatoId, address owner);
+    event TomatoMinted(uint8 tomatoId, address owner);
     event TomatoGrown(uint256 tomatoId, uint8 stage);
-    event TomatoGrowthRequest(uint256 tomatoId, bytes32 requestId);
+    event TomatoGrowthRequest(uint8 tomatoId, bytes32 requestId);
     event WeatherDataReceived(uint256 temperature, uint256 humidity);
     event Debug(string msg);
 
-    uint8 public constant VERSION = 4;
+    uint8 public constant CONTRACT_VERSION = 6;
 
     /* CHAINLINK */
     address FUNCTIONS_ROUTER = 0xb83E47C2bC239B3bf370bc41e1459A34b41238D0;
     bytes32 DON_ID = 0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000;
     uint32 GAS_LIMIT = 300000;
-    uint64 SUBSCRIPTION_ID = 4291; //4351 deployment
+    uint64 SUBSCRIPTION_ID = 4351; //4291 testing
     string dataRequest =
         "const ethers = await import('npm:ethers@6.13.5');"
         "const response = await Functions.makeHttpRequest({"
@@ -57,12 +47,12 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     uint8 public constant MIN_FAVORABLE_TEMPERATURE = 10;
     uint8 public constant MAX_FAVORABLE_TEMPERATURE = 30;
     uint8 public constant MIN_FAVORABLE_HUMIDITY = 40;
-    uint8 public constant MAX_FAVORABLE_HUMIDITY = 80;
+    uint8 public constant MAX_FAVORABLE_HUMIDITY = 90;
 
-    uint256 private _tomatoesIds;
-    mapping(uint256 => uint8) private _tomatoesStages;
-    mapping(bytes32 => uint256) private _updateRequests;
-    mapping(uint256 => address) private _tomatoOwners;
+    uint8 private _tomatoesIds;
+    mapping(uint8 => uint8) private _tomatoesStages;
+    mapping(bytes32 => uint8) private _updateRequests;
+    mapping(uint8 => address) private _tomatoOwners;
 
     constructor()
         ERC721("DynamicTomatoes", "DT")
@@ -71,7 +61,7 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     {}
 
     function mint() public {
-        uint256 tomatoId = _tomatoesIds;
+        uint8 tomatoId = _tomatoesIds;
 
         _safeMint(msg.sender, tomatoId);
         emit Debug("minted");
@@ -83,35 +73,36 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         emit Debug("incremented counter");
     }
 
-    function getStage(uint256 _tomatoId) public view returns (uint8) {
+    function getStage(uint8 _tomatoId) public view returns (uint8) {
         return _tomatoesStages[_tomatoId];
     }
 
     function adminGrow(
-        uint256 _tomatoId
+        uint8 _tomatoId
     ) public onlyOwner growableTomato(_tomatoId) {
         _setStage(_tomatoId, _tomatoesStages[_tomatoId] + 1);
     }
 
     function forceGrow(
-        uint256 _tomatoId,
+        uint8 _tomatoId,
         uint256 _temperature,
         uint256 _humidity
     ) public onlyOwner growableTomato(_tomatoId) {
-        tryWeatherGrow(_tomatoId, _temperature, _humidity);
+        _tryWeatherGrow(_tomatoId, _temperature, _humidity);
     }
 
-    function _setStage(uint256 _tomatoId, uint8 _stage) internal {
+    function _setStage(uint8 _tomatoId, uint8 _stage) internal {
         emit Debug("set stage");
-
         _tomatoesStages[_tomatoId] = _stage;
+        emit Debug("stage updated");
         _setTokenURI(_tomatoId, metadata[_stage]);
+        emit Debug("metadata updated");
 
         emit TomatoGrown(_tomatoId, _stage);
     }
 
     function grow(
-        uint256 _tomatoId,
+        uint8 _tomatoId,
         uint8 _secretsSlotID,
         uint64 _secretsVersion
     ) public onlyAdminOrTomatoOwner(_tomatoId) growableTomato(_tomatoId) {
@@ -146,13 +137,13 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         emit Debug(string.concat("RESPONSE: ", string(response)));
         (uint256 temp, uint256 hum) = abi.decode(response, (uint256, uint256));
         emit WeatherDataReceived(temp, hum);
-        uint256 tomatoId = _updateRequests[requestId];
+        uint8 tomatoId = _updateRequests[requestId];
 
-        tryWeatherGrow(tomatoId, temp, hum);
+        _tryWeatherGrow(tomatoId, temp, hum);
     }
 
-    function tryWeatherGrow(
-        uint256 _tomatoId,
+    function _tryWeatherGrow(
+        uint8 _tomatoId,
         uint256 _temperature,
         uint256 _humidity
     ) internal {
@@ -177,7 +168,7 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
                 humidity < MAX_FAVORABLE_HUMIDITY);
     }
 
-    modifier onlyAdminOrTomatoOwner(uint256 _tomatoId) {
+    modifier onlyAdminOrTomatoOwner(uint8 _tomatoId) {
         require(
             msg.sender == _tomatoOwners[_tomatoId] || msg.sender == owner(),
             "only the tomato owner (or admin) can grow it"
@@ -185,7 +176,7 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         _;
     }
 
-    modifier growableTomato(uint256 _tomatoId) {
+    modifier growableTomato(uint8 _tomatoId) {
         require(
             (_tomatoesStages[_tomatoId] + 1) < TOMATO_STAGES_COUNT,
             "tomato is fully grown"

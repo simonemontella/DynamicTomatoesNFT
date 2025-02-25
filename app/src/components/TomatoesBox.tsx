@@ -1,6 +1,6 @@
 import { CircularProgress, Grid } from "@mui/material";
 import { TomatoCard } from "./TomatoCard";
-import { getOwnedTomatoes } from "../chain/TomatoesContract";
+import { getOwnedTomatoes } from "../chain/TomatoesManager";
 
 export const TomatoesBox = () => {
     const { loading, nfts } = getOwnedTomatoes();

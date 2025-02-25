@@ -308,9 +308,9 @@ export const abi = [
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "uint256",
+                "internalType": "uint8",
                 "name": "tomatoId",
-                "type": "uint256"
+                "type": "uint8"
             },
             {
                 "indexed": false,
@@ -327,9 +327,9 @@ export const abi = [
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "uint256",
+                "internalType": "uint8",
                 "name": "tomatoId",
-                "type": "uint256"
+                "type": "uint8"
             },
             {
                 "indexed": false,
@@ -384,6 +384,19 @@ export const abi = [
         ],
         "name": "WeatherDataReceived",
         "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "CONTRACT_VERSION",
+        "outputs": [
+            {
+                "internalType": "uint8",
+                "name": "",
+                "type": "uint8"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
     },
     {
         "inputs": [],
@@ -451,24 +464,11 @@ export const abi = [
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "VERSION",
-        "outputs": [
-            {
-                "internalType": "uint8",
-                "name": "",
-                "type": "uint8"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
-                "internalType": "uint256",
+                "internalType": "uint8",
                 "name": "_tomatoId",
-                "type": "uint256"
+                "type": "uint8"
             }
         ],
         "name": "adminGrow",
@@ -516,9 +516,9 @@ export const abi = [
     {
         "inputs": [
             {
-                "internalType": "uint256",
+                "internalType": "uint8",
                 "name": "_tomatoId",
-                "type": "uint256"
+                "type": "uint8"
             },
             {
                 "internalType": "uint256",
@@ -558,9 +558,9 @@ export const abi = [
     {
         "inputs": [
             {
-                "internalType": "uint256",
+                "internalType": "uint8",
                 "name": "_tomatoId",
-                "type": "uint256"
+                "type": "uint8"
             }
         ],
         "name": "getStage",
@@ -577,9 +577,9 @@ export const abi = [
     {
         "inputs": [
             {
-                "internalType": "uint256",
+                "internalType": "uint8",
                 "name": "_tomatoId",
-                "type": "uint256"
+                "type": "uint8"
             },
             {
                 "internalType": "uint8",
