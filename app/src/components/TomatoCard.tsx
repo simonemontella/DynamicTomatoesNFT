@@ -1,7 +1,7 @@
 import { Card, CardContent, Typography, CircularProgress, Box, Button } from '@mui/material';
 import { OwnedNft } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
-import { growTomato } from '../chain/TomatoesManager';
+import { CONTRACT_ADDRESS, useRequestGrow } from '../chain/TomatoesManager';
 import { ActionDialog } from './ActionDialog';
 
 interface TomatoCardProps {
@@ -29,13 +29,15 @@ export const TomatoCard = ({ tomato }: TomatoCardProps) => {
             } catch (error) {
                 console.error('Error fetching tomato image:', error);
             }
+
             setDownloading(false);
         };
 
         fetchImage();
     }, [imageUrl]);
 
-    const { grow, isLoading: growLoading, isError, isSuccess, status: growStatus, error: growError } = growTomato(Number(id));
+    const { requestGrow, isLoading: growLoading,
+        isError, isSuccess, status: growStatus, error: growError } = useRequestGrow(Number(id));
     const [dialogOpen, setDialogOpen] = useState(false);
 
     const handleClose = () => {
@@ -44,11 +46,15 @@ export const TomatoCard = ({ tomato }: TomatoCardProps) => {
         }
     };
 
+    const viewOnOpenSea = () => {
+        window.open(`https://testnets.opensea.io/assets/sepolia/${CONTRACT_ADDRESS}/${id}`, '_blank');
+    };
+
     return (
         <>
             <Card>
                 <CardContent>
-                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: 200, mb: 2 }}>
+                    <Box className="centered" sx={{ height: 200, mb: 2 }}>
                         {downloading ? (
                             <CircularProgress />
                         ) : (
@@ -68,17 +74,27 @@ export const TomatoCard = ({ tomato }: TomatoCardProps) => {
                         Growth Stage: {stage}
                     </Typography>
 
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        sx={{ mt: 2 }}
-                        onClick={() => { setDialogOpen(true) }}>
-                        REQUEST GROW
-                    </Button>
+                    <Box className="centered" sx={{ flexDirection: 'column' }}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            sx={{ mt: 2 }}
+                            onClick={() => { setDialogOpen(true) }}>
+                            REQUEST GROW
+                        </Button>
+
+                        <Button
+                            variant="contained"
+                            color="secondary"
+                            sx={{ mt: 2 }}
+                            onClick={viewOnOpenSea}>
+                            VIEW ON OPENSEA
+                        </Button>
+                    </Box>
 
                     <ActionDialog
                         open={dialogOpen}
-                        action={grow}
+                        action={requestGrow}
                         title={`REQUESTING TOMATO #${id} GROW`}
                         message={growStatus!}
                         error={growError!}

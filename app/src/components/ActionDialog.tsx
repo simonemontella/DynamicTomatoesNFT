@@ -1,5 +1,5 @@
 import { CheckCircleOutline, ErrorOutline } from "@mui/icons-material";
-import { Box, CircularProgress, Dialog, DialogContent, DialogContentText, DialogTitle, Icon, Typography } from "@mui/material";
+import { Box, CircularProgress, Dialog, DialogContent, DialogContentText, DialogTitle, Typography } from "@mui/material";
 import { useEffect } from "react";
 
 interface ActionDialogProps {

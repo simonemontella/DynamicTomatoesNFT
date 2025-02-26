@@ -40,9 +40,9 @@ export const getTheme = (mode: 'light' | 'dark') => createTheme({
       dark: '#00b26f',
     },
     secondary: {
-      main: '#ff4081',
-      light: '#ff669a',
-      dark: '#b22c5a',
+      main: '#2196f3',
+      light: '#6ec6ff',
+      dark: '#0069c0',
     },
     background: {
       default: mode === 'dark' ? '#0a0b0d' : '#f5f5f5',
