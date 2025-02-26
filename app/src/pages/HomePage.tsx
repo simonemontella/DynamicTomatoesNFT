@@ -5,18 +5,16 @@ import { usePlantTomato } from '../chain/TomatoesManager';
 import { useState } from 'react';
 import { ActionDialog } from '../components/ActionDialog';
 
-export const Home = () => {
+export const HomePage = () => {
     const { isConnected } = useAccount();
     const { plantTomato, isLoading, isError, isSuccess, status, error } = usePlantTomato();
     const [dialogOpen, setDialogOpen] = useState(false);
+    const [reload, setReload] = useState(false);
 
     const handleClose = () => {
         if (!isLoading) {
             setDialogOpen(false);
-
-            if (isSuccess) {
-                window.location.reload(); //TODO change to soft reload
-            }
+            setReload(!reload);
         }
     };
 
@@ -35,6 +33,7 @@ export const Home = () => {
                 <Typography variant="h2" sx={{ mb: 3, color: 'text.secondary' }}>
                     Grow your virtual tomato plants on the blockchain
                 </Typography>
+
                 {!isConnected && (
                     <Typography variant="body1" color="text.secondary">
                         Connect your wallet to start growing tomatoes
@@ -46,12 +45,15 @@ export const Home = () => {
                 <>
                     <Box sx={{ mb: 4, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                         <Typography variant="h3">Your Tomatoes</Typography>
+
                         <Button variant="contained" color="primary" size="large"
                             onClick={() => { setDialogOpen(true) }}>
                             Plant New Tomato 🌱
                         </Button>
                     </Box>
-                    <TomatoesBox />
+
+                    <TomatoesBox reload={reload} />
+
                     <ActionDialog
                         open={dialogOpen}
                         action={plantTomato}

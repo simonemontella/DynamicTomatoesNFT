@@ -1,40 +1,55 @@
 import { useState, useEffect } from 'react';
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
-import { Alchemy, Network, OwnedNft } from "alchemy-sdk";
-import { abi } from './abi';
+import { abi, CONTRACT_ADDRESS } from './ContractInfos';
+import { alchemy } from './ChainInteractions';
+import { OwnedNft } from 'alchemy-sdk';
 
-export const CONTRACT_ADDRESS = '0x308675Dcd2aF0468c2771F3442eB2Fc3489BD49c';
-const alchemy = new Alchemy({
-    apiKey: import.meta.env.VITE_ALCHEMY_API_KEY as string,
-    network: Network.ETH_SEPOLIA,
-});
-
-export function getOwnedTomatoes() {
-    const { address, isConnected } = useAccount();
-    const [nfts, setNfts] = useState<OwnedNft[]>([]);
+export function useGetTomatoes() {
+    const { address } = useAccount();
+    const [tomatoes, setTomatoes] = useState<OwnedNft[]>([]);
     const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        if (!address || !isConnected) return;
+    const getTomatoes = async () => {
+        setLoading(true);
+        try {
+            const response = await alchemy.nft.getNftsForOwner(address!, {
+                contractAddresses: [CONTRACT_ADDRESS],
+            });
+            setTomatoes(response.ownedNfts);
+        } catch (error) {
+            console.error("Error while fetching nfts:", error);
+        }
+        setLoading(false);
+    };
 
-        const fetchNfts = async () => {
-            setLoading(true);
-            try {
-                const response = await alchemy.nft.getNftsForOwner(address, {
-                    contractAddresses: [CONTRACT_ADDRESS],
-                });
-                setNfts(response.ownedNfts);
-            } catch (error) {
-                console.error("Error while fetching nfts:", error);
-            }
-            setLoading(false);
-        };
-
-        fetchNfts();
-    }, [address, isConnected]);
-
-    return { loading, nfts };
+    return { getTomatoes, loading, tomatoes };
 };
+
+export async function refreshTomato(tomatoId: number) {
+    try {
+        if (await alchemy.nft.refreshNftMetadata(CONTRACT_ADDRESS, tomatoId)) {
+            return await alchemy.nft.getNftMetadata(CONTRACT_ADDRESS, tomatoId);
+        }
+    } catch (error) {
+        console.error('Error while refreshing metadata:', error);
+    }
+
+    return null;
+}
+
+export async function getTomatoImage(imageUrl: string) {
+    const gateway = `https://${import.meta.env.VITE_IPFS_GATEWAY_URL}/ipfs/`;
+    const cid = imageUrl.replace('ipfs://', '');
+
+    try {
+        const response = await fetch(gateway + cid);
+        const imageBlob = await response.blob();
+        return URL.createObjectURL(imageBlob);
+    } catch (error) {
+        console.error('Error fetching tomato image:', error);
+        return null;
+    }
+}
 
 export function useRequestGrow(tomatoId: number) {
     const [isLoading, setLoading] = useState(false);

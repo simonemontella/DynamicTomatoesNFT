@@ -1,18 +1,23 @@
 import { useState, useEffect } from 'react';
 import { AppBar, Toolbar, Typography, Button, Box, } from '@mui/material';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
-import { metaMaskConnector } from '../chain/Wagmi';
+import { metaMaskConnector } from '../chain/ChainInteractions';
 import { useThemeMode } from './Theme';
 
 export const Navbar = () => {
   const { mode } = useThemeMode();
   const { address, isConnected } = useAccount();
   const { connect } = useConnect();
-  const { disconnect } = useDisconnect();
+  const { disconnect: logout } = useDisconnect();
 
   const formatAddress = (addr: string) => {
     return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
   };
+
+  const disconnect = () => {
+    logout();
+    if (window.location.pathname !== '/') window.location.href = '/';
+  }
 
   const connectButton = (
     <Button

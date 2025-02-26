@@ -41,7 +41,8 @@ export function ActionDialog({ open, onClose, action, title, message, error, isL
                                 <code>{error}</code>
                             </Typography>
                         </Box>
-                    ) : <DialogContentText sx={{ maxHeight: 200, wordBreak: 'break-word', whiteSpace: 'pre-wrap', p: 1 }}>{message}</DialogContentText>}
+                    ) :
+                        <DialogContentText sx={{ maxHeight: 200, wordBreak: 'break-word', whiteSpace: 'pre-wrap', p: 1 }}>{message}</DialogContentText>}
                 </Box>
             </DialogContent>
         </Dialog>

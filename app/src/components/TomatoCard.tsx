@@ -1,16 +1,19 @@
-import { Card, CardContent, Typography, CircularProgress, Box, Button } from '@mui/material';
+import { Card, CardContent, Typography, CircularProgress, Box } from '@mui/material';
 import { OwnedNft } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
-import { CONTRACT_ADDRESS, useRequestGrow } from '../chain/TomatoesManager';
-import { ActionDialog } from './ActionDialog';
+import { useNavigate } from 'react-router-dom';
+import { RequestGrowButton, ViewOnOpenSeaButton } from './TomatoButtons';
+import { IpfsImage } from 'react-ipfs-image';
+import { getTomatoImage } from '../chain/TomatoesManager';
 
 interface TomatoCardProps {
     tomato: OwnedNft;
 }
 
 export const TomatoCard = ({ tomato }: TomatoCardProps) => {
+    const navigate = useNavigate();
     const id = tomato.tokenId;
-    const imageUrl = tomato.image.originalUrl;
+    const imageUrl = tomato.raw.metadata.image;
     const stage = tomato.raw.metadata.attributes.find((attr: any) => attr.trait_type === 'Stage').value;
 
     const [image, setImage] = useState<string | null>(null);
@@ -18,91 +21,39 @@ export const TomatoCard = ({ tomato }: TomatoCardProps) => {
 
     useEffect(() => {
         const fetchImage = async () => {
-            try {
-                if (imageUrl) {
-                    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
-                    const response = await fetch(proxyUrl + imageUrl);
-                    const imageBlob = await response.blob();
-                    const imageObjectURL = URL.createObjectURL(imageBlob);
-                    setImage(imageObjectURL);
-                }
-            } catch (error) {
-                console.error('Error fetching tomato image:', error);
-            }
-
+            setImage(await getTomatoImage(imageUrl!));
             setDownloading(false);
         };
 
         fetchImage();
     }, [imageUrl]);
 
-    const { requestGrow, isLoading: growLoading,
-        isError, isSuccess, status: growStatus, error: growError } = useRequestGrow(Number(id));
-    const [dialogOpen, setDialogOpen] = useState(false);
-
-    const handleClose = () => {
-        if (!growLoading) {
-            setDialogOpen(false);
-        }
-    };
-
-    const viewOnOpenSea = () => {
-        window.open(`https://testnets.opensea.io/assets/sepolia/${CONTRACT_ADDRESS}/${id}`, '_blank');
+    const handleCardClick = () => {
+        navigate(`/tomato`, { state: { tomato, tomatoImage: image } });
     };
 
     return (
         <>
             <Card>
                 <CardContent>
-                    <Box className="centered" sx={{ height: 200, mb: 2 }}>
-                        {downloading ? (
-                            <CircularProgress />
-                        ) : (
-                            image ? (
-                                <img src={image} alt={`Tomato Image`} style={{ maxHeight: '100%', maxWidth: '100%' }} />
-                            ) : (
-                                <Typography variant="body2" color="error">
-                                    Error fetching tomato image
-                                </Typography>
-                            )
-                        )}
+                    <Box sx={{ cursor: 'pointer' }} onClick={handleCardClick}>
+                        <Box className="centered" sx={{ height: 200, mb: 2 }}>
+                            {downloading ? <CircularProgress /> :
+                                (image != null) ? <img src={image} alt={`Tomato Image`} style={{ maxHeight: '100%', maxWidth: '100%' }} /> : <Typography variant="body2">Error loading image</Typography>}
+                        </Box>
+                        <Typography variant="h5" gutterBottom>
+                            Tomato #{id}
+                        </Typography>
+                        <Typography variant="body2" color="text.secondary">
+                            Growth Stage: {stage}
+                        </Typography>
                     </Box>
-                    <Typography variant="h5" gutterBottom>
-                        Tomato #{id}
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                        Growth Stage: {stage}
-                    </Typography>
 
                     <Box className="centered" sx={{ flexDirection: 'column' }}>
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            sx={{ mt: 2 }}
-                            onClick={() => { setDialogOpen(true) }}>
-                            REQUEST GROW
-                        </Button>
+                        <RequestGrowButton tomatoId={id} />
 
-                        <Button
-                            variant="contained"
-                            color="secondary"
-                            sx={{ mt: 2 }}
-                            onClick={viewOnOpenSea}>
-                            VIEW ON OPENSEA
-                        </Button>
+                        <ViewOnOpenSeaButton tomatoId={id} />
                     </Box>
-
-                    <ActionDialog
-                        open={dialogOpen}
-                        action={requestGrow}
-                        title={`REQUESTING TOMATO #${id} GROW`}
-                        message={growStatus!}
-                        error={growError!}
-                        isError={isError}
-                        isSuccess={isSuccess}
-                        isLoading={growLoading}
-                        onClose={handleClose}
-                    />
                 </CardContent>
             </Card >
         </>

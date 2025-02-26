@@ -2,7 +2,9 @@ import './App.css'
 import { ThemeProvider as MUIThemeProvider, CssBaseline } from '@mui/material';
 import { getTheme, useThemeMode, ThemeProvider } from './theme/Theme';
 import { Layout } from './theme/Layout';
-import { Home } from './pages/Home';
+import { HomePage } from './pages/HomePage';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { TomatoPage } from './pages/TomatoPage';
 
 function InnerApp() {
   const { mode } = useThemeMode();
@@ -12,7 +14,12 @@ function InnerApp() {
     <MUIThemeProvider theme={theme}>
       <CssBaseline />
       <Layout>
-        <Home />
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/tomato" element={<TomatoPage />} />
+          </Routes>
+        </BrowserRouter>
       </Layout>
     </MUIThemeProvider>
   );
