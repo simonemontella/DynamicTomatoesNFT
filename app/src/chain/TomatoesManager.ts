@@ -2,11 +2,11 @@ import { useState, useEffect } from 'react';
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
 import { abi, CONTRACT_ADDRESS } from './ContractInfos';
 import { alchemy } from './ChainInteractions';
-import { OwnedNft } from 'alchemy-sdk';
+import { Tomato } from './Tomato';
 
 export function useGetTomatoes() {
     const { address } = useAccount();
-    const [tomatoes, setTomatoes] = useState<OwnedNft[]>([]);
+    const [tomatoes, setTomatoes] = useState<Tomato[]>([]);
     const [loading, setLoading] = useState(false);
 
     const getTomatoes = async () => {
@@ -15,7 +15,8 @@ export function useGetTomatoes() {
             const response = await alchemy.nft.getNftsForOwner(address!, {
                 contractAddresses: [CONTRACT_ADDRESS],
             });
-            setTomatoes(response.ownedNfts);
+
+            setTomatoes(response.ownedNfts.map(nft => new Tomato(nft)));
         } catch (error) {
             console.error("Error while fetching nfts:", error);
         }
@@ -25,10 +26,10 @@ export function useGetTomatoes() {
     return { getTomatoes, loading, tomatoes };
 };
 
-export async function refreshTomato(tomatoId: number) {
+export async function refreshTomato(tomato: Tomato) {
     try {
-        if (await alchemy.nft.refreshNftMetadata(CONTRACT_ADDRESS, tomatoId)) {
-            return await alchemy.nft.getNftMetadata(CONTRACT_ADDRESS, tomatoId);
+        if (await alchemy.nft.refreshNftMetadata(CONTRACT_ADDRESS, tomato.id)) {
+            return new Tomato(await alchemy.nft.getNftMetadata(CONTRACT_ADDRESS, tomato.id));
         }
     } catch (error) {
         console.error('Error while refreshing metadata:', error);

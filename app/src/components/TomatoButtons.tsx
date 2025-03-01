@@ -2,15 +2,15 @@ import { useState } from "react";
 import { useRequestGrow } from "../chain/TomatoesManager";
 import { Button } from "@mui/material";
 import { ActionDialog } from "./ActionDialog";
-import { CONTRACT_ADDRESS } from "../chain/ContractInfos";
+import { Tomato } from "../chain/Tomato";
 
 interface TomatoButtonsProps {
-    tomatoId: string;
+    tomato: Tomato;
 }
 
-export const RequestGrowButton = ({ tomatoId }: TomatoButtonsProps) => {
+export const RequestGrowButton = ({ tomato }: TomatoButtonsProps) => {
     const { requestGrow, isLoading: growLoading,
-        isError, isSuccess, status: growStatus, error: growError } = useRequestGrow(Number(tomatoId));
+        isError, isSuccess, status: growStatus, error: growError } = useRequestGrow(tomato.id);
     const [dialogOpen, setDialogOpen] = useState(false);
 
     const handleClose = () => {
@@ -32,7 +32,7 @@ export const RequestGrowButton = ({ tomatoId }: TomatoButtonsProps) => {
             <ActionDialog
                 open={dialogOpen}
                 action={requestGrow}
-                title={`REQUESTING TOMATO #${tomatoId} GROW`}
+                title={`REQUESTING TOMATO #${tomato.id} GROW`}
                 message={growStatus!}
                 error={growError!}
                 isError={isError}
@@ -44,9 +44,9 @@ export const RequestGrowButton = ({ tomatoId }: TomatoButtonsProps) => {
     )
 }
 
-export const ViewOnOpenSeaButton = ({ tomatoId }: TomatoButtonsProps) => {
+export const ViewOnOpenSeaButton = ({ tomato }: TomatoButtonsProps) => {
     const viewOnOpenSea = () => {
-        window.open(`https://testnets.opensea.io/assets/sepolia/${CONTRACT_ADDRESS}/${tomatoId}`, '_blank');
+        window.open(tomato.openSeaUrl, '_blank');
     };
 
     return (

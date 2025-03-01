@@ -1,32 +1,29 @@
 import { Card, CardContent, Typography, CircularProgress, Box } from '@mui/material';
-import { OwnedNft } from 'alchemy-sdk';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { RequestGrowButton, ViewOnOpenSeaButton } from './TomatoButtons';
-import { IpfsImage } from 'react-ipfs-image';
 import { getTomatoImage } from '../chain/TomatoesManager';
+import { Tomato } from '../chain/Tomato';
 
 interface TomatoCardProps {
-    tomato: OwnedNft;
+    tomato: Tomato;
 }
 
 export const TomatoCard = ({ tomato }: TomatoCardProps) => {
     const navigate = useNavigate();
-    const id = tomato.tokenId;
-    const imageUrl = tomato.raw.metadata.image;
-    const stage = tomato.raw.metadata.attributes.find((attr: any) => attr.trait_type === 'Stage').value;
 
     const [image, setImage] = useState<string | null>(null);
-    const [downloading, setDownloading] = useState<boolean>(true);
+    const [downloading, setDownloading] = useState<boolean>(false);
 
     useEffect(() => {
         const fetchImage = async () => {
-            setImage(await getTomatoImage(imageUrl!));
+            setDownloading(true);
+            setImage(await getTomatoImage(tomato.imageUrl));
             setDownloading(false);
         };
 
         fetchImage();
-    }, [imageUrl]);
+    }, [tomato]);
 
     const handleCardClick = () => {
         navigate(`/tomato`, { state: { tomato, tomatoImage: image } });
@@ -42,17 +39,17 @@ export const TomatoCard = ({ tomato }: TomatoCardProps) => {
                                 (image != null) ? <img src={image} alt={`Tomato Image`} style={{ maxHeight: '100%', maxWidth: '100%' }} /> : <Typography variant="body2">Error loading image</Typography>}
                         </Box>
                         <Typography variant="h5" gutterBottom>
-                            Tomato #{id}
+                            {tomato.displayName}
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
-                            Growth Stage: {stage}
+                            Growth Stage: {tomato.stage}
                         </Typography>
                     </Box>
 
                     <Box className="centered" sx={{ flexDirection: 'column' }}>
-                        <RequestGrowButton tomatoId={id} />
+                        <RequestGrowButton tomato={tomato} />
 
-                        <ViewOnOpenSeaButton tomatoId={id} />
+                        <ViewOnOpenSeaButton tomato={tomato} />
                     </Box>
                 </CardContent>
             </Card >
