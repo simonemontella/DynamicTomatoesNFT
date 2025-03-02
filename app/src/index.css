@@ -50,15 +50,6 @@ a:hover {
   color: inherit !important;
 }
 
-.tomato-history {
-  background-color: #ff6347;
-  color: white;
-  padding: 0.5em 1em;
-  border-radius: 4px;
-  font-size: 0.9em;
-  font-weight: 500;
-}
-
 body {
   margin: 0;
   display: flex;

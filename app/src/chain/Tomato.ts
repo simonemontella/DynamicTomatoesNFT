@@ -40,10 +40,12 @@ export class Tomato {
 }
 
 export class TomatoEvent {
-    txHash: string;
     timestamp: string;
     type: TomatoEventType | undefined;
     args: Object | undefined;
+    txHash: string;
+    blockNumber!: bigint;
+    txIndex!: string;
 
     constructor(type: TomatoEventType | undefined, txHash: string, timestamp?: string, args?: Object) {
         this.txHash = txHash;
@@ -51,14 +53,10 @@ export class TomatoEvent {
         this.type = type;
         this.args = args;
     }
-
-    get typeName() {
-        return this.type!.replace("_", " ");
-    }
 }
 
 export enum TomatoEventType {
-    TomatoMinted = 'PLANT', //TODO TomatoPlanted
+    TomatoMinted = 'PLANT',
     TomatoGrowthRequest = 'GROW REQUEST',
     TomatoGrown = 'GROW SUCCESS',
     TomatoGrowthFailed = 'GROW FAIL',

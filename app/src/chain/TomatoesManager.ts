@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAccount, useWaitForTransactionReceipt, useWriteContract } from 'wagmi';
-import { abi, CONTRACT_ADDRESS } from './ContractInfos';
+import { ABI, CONTRACT_ADDRESS } from './ContractInfos';
 import { alchemy } from './ChainInteractions';
 import { Tomato } from './Tomato';
 
@@ -96,9 +96,9 @@ export function useRequestGrow(tomatoId: number) {
 
             setStatus('Secrets uploaded, calling grow function...');
             await writeContractAsync({
-                abi: abi,
+                abi: ABI,
                 address: CONTRACT_ADDRESS,
-                functionName: 'grow', //TODO change to requestGrow
+                functionName: 'requestGrow', //TODO change to requestGrow
                 args: [tomatoId, secretsData.slotID, secretsData.version],
             });
         } catch (error) {
@@ -155,7 +155,7 @@ export function usePlantTomato() {
         try {
             setStatus('Planting tomato...');
             await writeContractAsync({
-                abi: abi,
+                abi: ABI,
                 address: CONTRACT_ADDRESS,
                 functionName: 'mint',
                 args: [],

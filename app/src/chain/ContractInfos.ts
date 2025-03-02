@@ -1,5 +1,6 @@
-export const CONTRACT_ADDRESS = '0x308675Dcd2aF0468c2771F3442eB2Fc3489BD49c';
-export const abi = [
+export const CONTRACT_ADDRESS = '0xb8B47ABD98B56C3fa0fa3d9F991306ba3ab2f27B';
+export const DEPLOY_BLOCK_NUMBER = BigInt(7811034);
+export const ABI = [
     {
         "inputs": [],
         "stateMutability": "nonpayable",
@@ -219,19 +220,6 @@ export const abi = [
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "string",
-                "name": "msg",
-                "type": "string"
-            }
-        ],
-        "name": "Debug",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
                 "internalType": "uint256",
                 "name": "_tokenId",
                 "type": "uint256"
@@ -297,7 +285,7 @@ export const abi = [
             {
                 "indexed": false,
                 "internalType": "uint8",
-                "name": "stage",
+                "name": "newStage",
                 "type": "uint8"
             }
         ],
@@ -309,9 +297,46 @@ export const abi = [
         "inputs": [
             {
                 "indexed": false,
+                "internalType": "uint256",
+                "name": "tomatoId",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "string",
+                "name": "reason",
+                "type": "string"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "temperature",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "humidity",
+                "type": "uint256"
+            }
+        ],
+        "name": "TomatoGrowthFail",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
                 "internalType": "uint8",
                 "name": "tomatoId",
                 "type": "uint8"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "requestBy",
+                "type": "address"
             },
             {
                 "indexed": false,
@@ -365,25 +390,6 @@ export const abi = [
             }
         ],
         "name": "Transfer",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "temperature",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "humidity",
-                "type": "uint256"
-            }
-        ],
-        "name": "WeatherDataReceived",
         "type": "event"
     },
     {
@@ -578,29 +584,6 @@ export const abi = [
     {
         "inputs": [
             {
-                "internalType": "uint8",
-                "name": "_tomatoId",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint8",
-                "name": "_secretsSlotID",
-                "type": "uint8"
-            },
-            {
-                "internalType": "uint64",
-                "name": "_secretsVersion",
-                "type": "uint64"
-            }
-        ],
-        "name": "grow",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "bytes32",
                 "name": "requestId",
                 "type": "bytes32"
@@ -700,6 +683,29 @@ export const abi = [
     {
         "inputs": [],
         "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint8",
+                "name": "_tomatoId",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint8",
+                "name": "_secretsSlotID",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint64",
+                "name": "_secretsVersion",
+                "type": "uint64"
+            }
+        ],
+        "name": "requestGrow",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

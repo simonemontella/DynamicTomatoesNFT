@@ -3,6 +3,7 @@ import { useRequestGrow } from "../chain/TomatoesManager";
 import { Button } from "@mui/material";
 import { ActionDialog } from "./ActionDialog";
 import { Tomato } from "../chain/Tomato";
+import { openLink } from "../Utils";
 
 interface TomatoButtonsProps {
     tomato: Tomato;
@@ -45,16 +46,12 @@ export const RequestGrowButton = ({ tomato }: TomatoButtonsProps) => {
 }
 
 export const ViewOnOpenSeaButton = ({ tomato }: TomatoButtonsProps) => {
-    const viewOnOpenSea = () => {
-        window.open(tomato.openSeaUrl, '_blank');
-    };
-
     return (
         <Button
             variant="contained"
             color="secondary"
             sx={{ mt: 2 }}
-            onClick={viewOnOpenSea}>
+            onClick={() => openLink(tomato.openSeaUrl)}>
             VIEW ON OPENSEA
         </Button>
     )

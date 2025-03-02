@@ -3,16 +3,13 @@ import { AppBar, Toolbar, Typography, Button, Box, } from '@mui/material';
 import { useAccount, useConnect, useDisconnect } from 'wagmi';
 import { metaMaskConnector } from '../chain/ChainInteractions';
 import { useThemeMode } from './Theme';
+import { formatHex } from '../Utils';
 
 export const Navbar = () => {
   const { mode } = useThemeMode();
   const { address, isConnected } = useAccount();
   const { connect } = useConnect();
   const { disconnect: logout } = useDisconnect();
-
-  const formatAddress = (addr: string) => {
-    return `${addr.slice(0, 6)}...${addr.slice(-4)}`;
-  };
 
   const disconnect = () => {
     logout();
@@ -31,7 +28,7 @@ export const Navbar = () => {
   const disconnectButton = (
     <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
       <Typography variant="body2" sx={{ display: { xs: 'none', sm: 'block' } }}>
-        {formatAddress(address || '')}
+        {formatHex(address || '')}
       </Typography>
       <Button
         variant="outlined"

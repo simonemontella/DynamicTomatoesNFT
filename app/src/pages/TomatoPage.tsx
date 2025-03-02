@@ -3,9 +3,9 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { RequestGrowButton, ViewOnOpenSeaButton } from '../components/TomatoButtons';
 import { getTomatoImage, refreshTomato } from '../chain/TomatoesManager';
 import { useEffect, useState } from 'react';
-import { Tomato, TomatoEvent } from '../chain/Tomato';
-import { getTxLink } from '../Utils';
+import { Tomato } from '../chain/Tomato';
 import { useGetHistory } from '../chain/EventsManager';
+import { EventCard } from '../components/EventCard';
 
 export const TomatoPage = () => {
     const navigate = useNavigate();
@@ -37,26 +37,30 @@ export const TomatoPage = () => {
         setupTomato();
     }, []);
 
-    const { getHistory, loading: logsLoading, logs, error: historyError } = useGetHistory();
-    const [history, setHistory] = useState<TomatoEvent[]>([]);
-    const [historyLoading, setHistoryLoading] = useState(true);
+    const { getHistory, loading: logsLoading, events, error: historyError } = useGetHistory();
+    const [reloadHistory, setReloadHistory] = useState(false);
 
     useEffect(() => {
+        if (!tomato) return;
+
         const loadHistory = async () => {
             await getHistory(tomato!);
         }
 
         loadHistory();
-    }, [tomato]);
+    }, [tomato, reloadHistory]);
 
     const reloadTomato = async () => {
         if (!tomato) return;
 
         setLoading(true);
+
         const updatedTomato = await refreshTomato(tomato);
         if (updatedTomato) {
             setTomato(updatedTomato);
+            setTomatoImage(await getTomatoImage(updatedTomato.imageUrl));
         }
+
         setLoading(false);
     };
 
@@ -87,14 +91,6 @@ export const TomatoPage = () => {
                                                 {tomato.mintDate}
                                             </span>
                                         </Typography>
-                                        <Typography variant="body1" color="text.secondary" >
-                                            At tx &nbsp;
-                                            <span className='code'>
-                                                <a href={getTxLink(tomato.mintTx)} target="_blank" rel="noopener noreferrer">
-                                                    #{tomato.mintTx.slice(0, 15)}...
-                                                </a>
-                                            </span>
-                                        </Typography>
                                     </Box>
 
                                     <Box className="centered" sx={{ flexDirection: 'column' }}>
@@ -116,10 +112,31 @@ export const TomatoPage = () => {
                             </Box>
 
                             <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                                <Typography variant="h3" textAlign={'left'}>Tomato's History</Typography>
-                                <Box className="tomato-history">
-                                    <Typography variant="body1">Growth Stages</Typography>
+                                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Typography variant="h3" textAlign={'left'}>Tomato's History</Typography>
+                                    <Button variant="outlined"
+                                        onClick={() => setReloadHistory(!reloadHistory)}>
+                                        REFRESH
+                                    </Button>
                                 </Box>
+                                {logsLoading ?
+                                    <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+                                        <CircularProgress />
+                                    </Box> :
+                                    <>
+                                        {historyError ? (
+                                            <Typography variant="h6" color="error">
+                                                Cannot load tomato's history
+                                            </Typography>
+                                        ) : (
+                                            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                                                {events.map((event, index) => (
+                                                    <EventCard key={index} event={event} />
+                                                ))}
+                                            </Box>
+                                        )}
+                                    </>
+                                }
                             </Box>
                         </Box>
                     ) : (
@@ -133,7 +150,3 @@ export const TomatoPage = () => {
         </Box >
     );
 };
-
-function useGetTomatoHistory(): { getHistory: any; loading: any; logs: any; } {
-    throw new Error('Function not implemented.');
-}

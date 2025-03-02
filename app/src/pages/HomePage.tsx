@@ -2,7 +2,7 @@ import { Box, Button, Typography } from '@mui/material';
 import { useAccount } from 'wagmi';
 import { TomatoesBox } from '../components/TomatoesBox';
 import { usePlantTomato } from '../chain/TomatoesManager';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ActionDialog } from '../components/ActionDialog';
 
 export const HomePage = () => {

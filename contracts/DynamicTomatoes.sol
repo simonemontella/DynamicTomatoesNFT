@@ -9,16 +9,25 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     using FunctionsRequest for FunctionsRequest.Request;
 
     event TomatoMinted(uint8 tomatoId, address owner);
-    event TomatoGrown(uint256 tomatoId, uint8 stage);
-    event TomatoGrowthRequest(uint8 tomatoId, bytes32 requestId);
-    event WeatherDataReceived(uint256 temperature, uint256 humidity);
-    event Debug(string msg);
+    event TomatoGrowthRequest(
+        uint8 tomatoId,
+        address requestBy,
+        bytes32 requestId
+    );
+    event TomatoGrown(uint8 tomatoId, uint8 newStage);
+    event TomatoGrowthFail(
+        uint8 tomatoId,
+        string reason,
+        uint256 temperature,
+        uint256 humidity
+    );
 
-    uint8 public constant CONTRACT_VERSION = 6;
+    uint8 public constant CONTRACT_VERSION = 7;
 
     /* CHAINLINK */
     address FUNCTIONS_ROUTER = 0xb83E47C2bC239B3bf370bc41e1459A34b41238D0;
-    bytes32 DON_ID = 0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000;
+    bytes32 DON_ID =
+        0x66756e2d657468657265756d2d7365706f6c69612d3100000000000000000000;
     uint32 GAS_LIMIT = 300000;
     uint64 SUBSCRIPTION_ID = 4351; //4291 testing
     string dataRequest =
@@ -64,13 +73,11 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         uint8 tomatoId = _tomatoesIds;
 
         _safeMint(msg.sender, tomatoId);
-        emit Debug("minted");
         _tomatoOwners[tomatoId] = msg.sender;
         _setStage(tomatoId, 0);
 
-        emit TomatoMinted(tomatoId, msg.sender);
         _tomatoesIds++;
-        emit Debug("incremented counter");
+        emit TomatoMinted(tomatoId, msg.sender);
     }
 
     function getStage(uint8 _tomatoId) public view returns (uint8) {
@@ -92,16 +99,13 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
     }
 
     function _setStage(uint8 _tomatoId, uint8 _stage) internal {
-        emit Debug("set stage");
         _tomatoesStages[_tomatoId] = _stage;
-        emit Debug("stage updated");
         _setTokenURI(_tomatoId, metadata[_stage]);
-        emit Debug("metadata updated");
 
-        emit TomatoGrown(_tomatoId, _stage);
+        emit TomatoGrown(_tomatoId, _stage + 1);
     }
 
-    function grow(
+    function requestGrow(
         uint8 _tomatoId,
         uint8 _secretsSlotID,
         uint64 _secretsVersion
@@ -117,10 +121,8 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
             DON_ID
         );
 
-        emit Debug("request sent");
         _updateRequests[requestId] = _tomatoId;
-        emit Debug("request saved");
-        emit TomatoGrowthRequest(_tomatoId, requestId);
+        emit TomatoGrowthRequest(_tomatoId, msg.sender, requestId);
     }
 
     function fulfillRequest(
@@ -128,15 +130,11 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         bytes memory response,
         bytes memory err
     ) internal override {
-        emit Debug("request fulfilled");
         if (err.length > 0) {
-            emit Debug(string.concat("ERROR: ", string(err)));
-            revert("cannot verify weather data due to an error");
+            revert(string(err));
         }
 
-        emit Debug(string.concat("RESPONSE: ", string(response)));
         (uint256 temp, uint256 hum) = abi.decode(response, (uint256, uint256));
-        emit WeatherDataReceived(temp, hum);
         uint8 tomatoId = _updateRequests[requestId];
 
         _tryWeatherGrow(tomatoId, temp, hum);
@@ -147,13 +145,15 @@ contract DynamicTomatoes is ERC721URIStorage, FunctionsClient, Ownable {
         uint256 _temperature,
         uint256 _humidity
     ) internal {
-        emit Debug("weather test");
         if (_isWeatherFavorable(_temperature, _humidity)) {
-            emit Debug("weather ok");
             _setStage(_tomatoId, _tomatoesStages[_tomatoId] + 1);
         } else {
-            emit Debug("weather fail");
-            revert("weather conditions are not favorable");
+            emit TomatoGrowthFail(
+                _tomatoId,
+                "weather conditions are not favorable",
+                _temperature,
+                _humidity
+            );
         }
     }
 
