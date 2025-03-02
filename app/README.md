@@ -1,50 +1,101 @@
-# React + TypeScript + Vite
+# Dynamic Tomatoes NFT
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Features
 
-Currently, two official plugins are available:
+- **Connect Wallet**: Seamless integration with MetaMask for blockchain interactions
+- **Plant Tomatoes**: Mint new tomato NFTs
+- **Growth System**: Tomatoes can grow through different stages based on real weather conditions
+- **Weather Integration**: Real-time weather data from OpenWeather API affects tomato growth
+- **NFT Visualization**: View your tomato NFTs and their current growth stage
+- **Event History**: Track all events related to your tomatoes (planting, growth requests, successful growth, failures)
+- **OpenSea Integration**: Direct links to view your NFTs on OpenSea
+- **Dark/Light Mode**: Customizable UI theme
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Tech Stack
 
-## Expanding the ESLint configuration
+- **Frontend**: React with TypeScript
+- **UI Framework**: Material-UI (MUI)
+- **Blockchain Integration**:
+  - Wagmi for React hooks
+  - Viem for Ethereum interactions
+  - Alchemy SDK for NFT data
+- **Weather Data**:
+  - OpenWeather API through Chainlink Functions (on-chain)
+  - wttr.in to display live data on the frontend
+- **Development**:
+  - Vite as build tool
+  - TypeScript
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Growth Request Flow
 
-- Configure the top-level `parserOptions` property like this:
+When requesting a tomato's growth, the following process occurs:
 
-```js
-export default tseslint.config({
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend
+    participant SecretsManager
+    participant DON as Chainlink DON
+    participant Contract as Smart Contract
+    participant Weather as OpenWeather API
+
+    User->>Frontend: Request Growth
+    Frontend->>SecretsManager: Request Secret Upload
+
+    SecretsManager->>SecretsManager: Encrypt API Key
+    SecretsManager->>DON: Upload Encrypted Secret
+    DON-->>SecretsManager: Return slotID & version
+    SecretsManager-->>Frontend: Return slotID & version
+
+    Frontend->>Contract: requestGrow(tomatoId, slotID, version)
+    Contract->>DON: Request Weather Data
+    DON->>Weather: Get Weather Data
+    Weather-->>DON: Return Weather Data
+    DON-->>Contract: Return Weather Data
+
+    alt Favorable Conditions
+        Contract->>Contract: Update Tomato Stage
+        Contract-->>Frontend: Emit TomatoGrown Event
+    else Unfavorable Conditions
+        Contract-->>Frontend: Emit TomatoGrowthFail Event
+    end
 ```
 
-- Replace `tseslint.configs.recommended` to `tseslint.configs.recommendedTypeChecked` or `tseslint.configs.strictTypeChecked`
-- Optionally add `...tseslint.configs.stylisticTypeChecked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and update the config:
+1. The frontend initiates a growth request
+2. The secrets manager service (running on port 3000) is contacted to:
+   - Generate an encrypted secret containing the OpenWeather API key
+   - Upload the secret to Chainlink's DON (Decentralized Oracle Network)
+   - Return the slotID and version of the uploaded secret
+3. The smart contract is called with:
+   - The tomato's ID
+   - The secret's slotID and version from step 2
+4. Chainlink Functions retrieve the weather data using the secret
+5. The smart contract processes the weather conditions and updates the tomato's state
+6. An event is emitted (TomatoGrown or TomatoGrowthFail) based on the outcome
 
-```js
-// eslint.config.js
-import react from 'eslint-plugin-react'
+Notes:
 
-export default tseslint.config({
-  // Set the react version
-  settings: { react: { version: '18.3' } },
-  plugins: {
-    // Add the react plugin
-    react,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended rules
-    ...react.configs.recommended.rules,
-    ...react.configs['jsx-runtime'].rules,
-  },
-})
-```
+- The secrets manager service must be running (`npm run dev` in `/secrets-manager`) before requesting growth
+- Growth requests will fail if the service is not available
+- Each growth request uploads a new secret that expires after 10 minutes
+
+## Smart Contract
+
+The smart contract is deployed on Sepolia testnet at: `0xb8B47ABD98B56C3fa0fa3d9F991306ba3ab2f27B`
+
+## Scripts
+
+- `npm run dev`: Start development server
+
+## Project Structure
+
+- `/src`: Source code
+  - `/chain`: Blockchain interaction logic
+  - `/components`: React components
+  - `/pages`: Application pages
+  - `/theme`: Theme configuration
+- `/secrets-manager`: Weather data integration service
+
+## Author
+
+Simone Montella (M63001566)
