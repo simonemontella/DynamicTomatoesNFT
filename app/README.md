@@ -1,4 +1,4 @@
-# Dynamic Tomatoes NFT
+# DAPP
 
 ## Features
 
