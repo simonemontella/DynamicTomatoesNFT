@@ -22,8 +22,7 @@ The project follows a layered architecture:
 2. **Oracle Layer**: Chainlink DON (Decentralized Oracle Network) for secure API access
 3. **Frontend Layer**: React/Vite application for user interaction
 4. **Storage Layer**: IPFS via Pinata for decentralized metadata storage
-5. **Secrets Management**: Local service for secure API key handling
-
+5. **Secrets Management**: Local service for secure API encrypting and uploading to Chainlink DON
 ## Project Structure
 
 - **`/contracts`**: Solidity smart contracts
