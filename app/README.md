@@ -2,14 +2,12 @@
 
 ## Features
 
-- **Connect Wallet**: Seamless integration with MetaMask for blockchain interactions
+- **Connect Wallet**: Seamless integration with MetaMask for dapp interactions
 - **Plant Tomatoes**: Mint new tomato NFTs
-- **Growth System**: Tomatoes can grow through different stages based on real weather conditions
-- **Weather Integration**: Real-time weather data from OpenWeather API affects tomato growth
-- **NFT Visualization**: View your tomato NFTs and their current growth stage
-- **Event History**: Track all events related to your tomatoes (planting, growth requests, successful growth, failures)
-- **OpenSea Integration**: Direct links to view your NFTs on OpenSea
-- **Dark/Light Mode**: Customizable UI theme
+- **Growth**: Request tomato growth
+- **NFT Visualization**: View tomato NFTs and their current growth stage
+- **Event History**: Track all events related to tomatoes (planting, growth requests, successful growth, failures)
+- **OpenSea Integration**: Direct links to view NFTs on OpenSea
 
 ## Tech Stack
 
@@ -27,8 +25,6 @@
   - TypeScript
 
 ## Growth Request Flow
-
-When requesting a tomato's growth, the following process occurs:
 
 ```mermaid
 sequenceDiagram
@@ -75,17 +71,8 @@ sequenceDiagram
 
 Notes:
 
-- The secrets manager service must be running (`npm run dev` in `/secrets-manager`) before requesting growth
-- Growth requests will fail if the service is not available
+- Growth requests will fail if the secret management service is not available
 - Each growth request uploads a new secret that expires after 10 minutes
-
-## Smart Contract
-
-The smart contract is deployed on Sepolia testnet at: `0xb8B47ABD98B56C3fa0fa3d9F991306ba3ab2f27B`
-
-## Scripts
-
-- `npm run dev`: Start development server
 
 ## Project Structure
 

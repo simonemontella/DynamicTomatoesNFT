@@ -11,7 +11,7 @@ export const EventCard = ({ event }: { event: TomatoEvent }) => {
         }}
             onClick={() => openLink(getTxLink(event.txHash))}>
             <Box sx={{ display: 'flex', gap: 1 }}>
-                <Chip label={event.type ?? "GENERIC"} /> {/* Display the event type */}
+                <Chip label={event.type ?? "GENERIC"} />
                 {/* <Chip label={formatHex(event.txHash)} />  */}
             </Box>
 
@@ -31,7 +31,7 @@ function getEventColor(event: TomatoEvent) {
         case TomatoEventType.TomatoMinted:
         case TomatoEventType.TomatoGrown:
             return 'green';
-        case TomatoEventType.TomatoGrowthFailed:
+        case TomatoEventType.TomatoGrowthFail:
             return 'red';
         case TomatoEventType.TomatoGrowthRequest:
             return 'gray';

@@ -59,6 +59,6 @@ export enum TomatoEventType {
     TomatoMinted = 'PLANT',
     TomatoGrowthRequest = 'GROW REQUEST',
     TomatoGrown = 'GROW SUCCESS',
-    TomatoGrowthFailed = 'GROW FAIL',
+    TomatoGrowthFail = 'GROW FAIL',
     Debug = 'DEBUG',
 }
