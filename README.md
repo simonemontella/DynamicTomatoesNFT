@@ -5,6 +5,7 @@ DynamicTomatoes is a project work developed as part of the Unina Blockchain & DA
 Users can mint virtual tomato plants as NFTs and grow them through various stages depending on the real weather conditions of Naples: if temperature and humidity are not favorable, basing on predefined requirements, growth requests will fail.
 
 The project smart contract is currently deployed on Sepolia Ethereum testnet at <code>0xb8B47ABD98B56C3fa0fa3d9F991306ba3ab2f27B</code> ([Contract](https://sepolia.etherscan.io/address/0xb8B47ABD98B56C3fa0fa3d9F991306ba3ab2f27B) - [Deployment Tx](https://sepolia.etherscan.io/tx/0x113aae8e8aac2a52fa00232675f6a2ffb9945286ffe15499e198979e716ab132))
+
 I also hosted a [live demo](http://195.231.65.90:5173/) for the frontend
 
 ## Key Features
