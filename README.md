@@ -8,6 +8,10 @@ The project smart contract is currently deployed on Sepolia Ethereum testnet at 
 
 I also hosted a [live demo](http://195.231.65.90:5173/) for the frontend
 
+
+## Video-Preview
+https://github.com/user-attachments/assets/87ceb87c-d2a6-4ceb-800a-ab164b41c3c6
+
 ## Key Features
 
 - **Dynamic NFTs**: Tomato NFTs evolve through 5 distinct growth stages based on real-world weather conditions
